@@ -2,8 +2,7 @@ package com.chertar;
 
 import junit.framework.TestCase;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
+import static org.assertj.core.api.Assertions.*;
 
 public class OrderTest extends TestCase {
 
@@ -35,17 +34,18 @@ public class OrderTest extends TestCase {
             assertThat(order.filledQty()).isEqualTo(10);
             assertThat(order.leavesQty()).isEqualTo(0);
             // expectedAvgPrice is derived from ((99.0 * 4) + (98.0 * 6)) / (4 + 6) = 98.4;
-            double expectedAvgPrice = 98.4
+            double expectedAvgPrice = 98.4;
             System.out.println(expectedAvgPrice);
             assertThat(order.avgPrice().doubleValue()).isCloseTo(expectedAvgPrice, within(0.001));
             assertThat(order.isFullyFilled()).isTrue();
         }
 
-    }
+        //Attempt to overfill
+        {
+            Fill fill = Fill.from(98.00, 1);
+            assertThatExceptionOfType(MatchingEngineException.class).isThrownBy(()->order.processFill(fill))
+                    .withMessageContaining("overfill");
 
-    public void testIsFullyFilled() {
-    }
-
-    public void testLeavesQty() {
+        }
     }
 }
