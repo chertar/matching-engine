@@ -1,15 +1,19 @@
 package com.chertar;
 
 import javax.sound.midi.Instrument;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class MatchingEngine {
     private final Instrument instrument;
-    private final Map<Long, List<Order>> bids = new HashMap<>();
-    private final Map<Long, List<Order>> asks = new HashMap<>();
+
+    private BookSide bids = new BookSide(side);
+    private BookSide asks = new BookSide(side);
+
+    private final SortedSet<PriceLevel> bidSet = new TreeSet<>();
+    private final Map<Long, PriceLevel> bidMap = new HashMap<>();
+
+
+
 
     public MatchingEngine(Instrument instrument) {
         Objects.requireNonNull(instrument);
@@ -32,7 +36,7 @@ public class MatchingEngine {
     private void processBid(Order order) {
         if (order.type() == OrderType.LIMIT) {
             // Check if order matches any asks
-            
+
 
             // Post the order if no match is found
         }
