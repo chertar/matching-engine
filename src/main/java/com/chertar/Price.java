@@ -12,7 +12,7 @@ public class Price implements Comparable<Price>{
     }
 
     private Price(double price) {
-        this.base = (long) price * DENOMINATOR;
+        this.base = (long) (price * DENOMINATOR);
         this.doubleValue = price;
     }
 
