@@ -38,7 +38,8 @@ public class Order {
         filledQty += fill.qty();
 
         //Update avg fill price
-        double newAvgPrice = (avgPrice.doubleValue() * previousFilledQty) + (fill.price().doubleValue() * fill.qty())
+        double previousAvgPrice = avgPrice.doubleValue();
+        double newAvgPrice = (previousAvgPrice * previousFilledQty + fill.price().doubleValue() * fill.qty())
                              / (previousFilledQty + fill.qty());
         this.avgPrice = Price.of(newAvgPrice);
     }
