@@ -4,8 +4,12 @@ import java.math.BigDecimal;
 
 public class Price implements Comparable<Price>{
     private final long base;
-    private final int DENOMINATOR = 100;
+    private static final int DENOMINATOR = 100;
     private final double doubleValue;
+
+    public static Price of(double value) {
+        return new Price(value);
+    }
 
     private Price(double price) {
         this.base = (long) price * DENOMINATOR;
@@ -45,5 +49,9 @@ public class Price implements Comparable<Price>{
         else {
             throw new MatchingEngineException("Unsupported side " + side);
         }
+    }
+    @Override
+    public String toString() {
+        return String.format("%.02f", doubleValue);
     }
 }
