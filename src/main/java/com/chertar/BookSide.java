@@ -22,8 +22,16 @@ public class BookSide {
         Iterator<PriceLevel> iterator = priceLevels.iterator();
         while (iterator.hasNext()) {
             PriceLevel level = iterator.next();
-            if (level.price)
+            if (order.type() == OrderType.MARKET || order.getLimitPrice().compareTo(level.price()) >= 0) {
+                matchOrders(order, level);
+            }
 
+        }
+    }
+    private void matchOrders(Order order, PriceLevel level) {
+        Iterator<Order> restingOrders = level.orderIterator();
+        while (restingOrders.hasNext()) {
+            
         }
     }
 }

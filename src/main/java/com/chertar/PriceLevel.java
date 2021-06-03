@@ -1,6 +1,7 @@
 package com.chertar;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class PriceLevel {
@@ -10,5 +11,10 @@ public class PriceLevel {
     public PriceLevel(Price price) {
         this.price = price;
     }
-    public price()
+    public Price price() {
+        return price;
+    }
+    Iterator<Order> orderIterator() {
+        return orders.iterator();
+    }
 }
