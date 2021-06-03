@@ -14,16 +14,19 @@ public class MatchingEngine {
         this.instrument = instrument;
     }
 
-    public void matchNewOrder(Order order) {
+    public List<Fill> attemptToFill(Order order) {
         Side side = order.side();
         if (side == Side.BUY) {
-            bids.processOrder(order);
+            return bids.attemptToFill(order);
         }
         else if (side == Side.SELL) {
-            asks.processOrder(order);
+            return asks.attemptToFill(order);
         }
         else {
             throw new MatchingEngineException("Unsupoorted side: " + side);
         }
+    }
+    public void post(Order order) {
+        // TODO
     }
 }
