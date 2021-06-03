@@ -12,6 +12,9 @@ public class Fill {
     public static Fill of(Price price, long qty) {
         return new Fill(price, qty);
     }
+    public static Fill from(double price, long qty) {
+        return new Fill(Price.of(price), qty);
+    }
     public long qty() {
         return this.qty;
     }

@@ -26,11 +26,11 @@ public class BookSide {
                 fills.addAll(newFills);
             }
             else if (order.type() == OrderType.LIMIT) {
-                if (order.getLimitPrice().equals(level.price())) {
+                if (order.limitPrice().equals(level.price())) {
                     List<Fill> newFills = generateFills(order, level, level.price());
                     fills.addAll(newFills);
                 }
-                else if (order.getLimitPrice().isMoreAggressiveThan(level.price(), side)) {
+                else if (order.limitPrice().isMoreAggressiveThan(level.price(), side)) {
                     List<Fill> newFills = generateFills(order, level, level.price());
                     fills.addAll(newFills);
                 }
