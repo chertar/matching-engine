@@ -1,12 +1,10 @@
 package com.chertar;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class PriceLevel {
     private final Price price;
-    private final List<Order> orders = new ArrayList<>();
+    private final Queue<Order> orders = new ArrayDeque<>();
 
     public PriceLevel(Price price) {
         this.price = price;
@@ -14,7 +12,24 @@ public class PriceLevel {
     public Price price() {
         return price;
     }
-    Iterator<Order> orderIterator() {
-        return orders.iterator();
+    public void putOrder(Order order) {
+        Objects.requireNonNull(order);
+        if(order.type() == OrderType.MARKET) {
+            throw new MatchingEngineException("Market order cannot be posted");
+        }
+        if (!order.limitPrice().equalsPrice(this.price)) {
+            throw new MatchingEngineException("Order and level prices don't match.");
+        }
+        orders.offer(order);
+    }
+
+    public Order peek() {
+        return orders.peek();
+    }
+    public Order poll() {
+        return orders.poll();
+    }
+    public int queueSize() {
+        return orders.size();
     }
 }

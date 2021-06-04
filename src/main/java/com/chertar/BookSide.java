@@ -44,13 +44,15 @@ public class BookSide {
 
     private List<Fill> generateFills(Order order, PriceLevel level, Price price) {
         List<Fill> fills = new ArrayList<>();
-        Iterator<Order> restingOrders = level.orderIterator();
-        while (restingOrders.hasNext()) {
-            Order restingOrder = restingOrders.next();
+        while (level.peek() != null) {
+            Order restingOrder = level.peek();
             long fillQty = Math.min(order.qty(), restingOrder.qty());
             final Fill fill = Fill.of(price, fillQty);
             fills.add(fill);
             restingOrder.processFill(fill);
+            if (restingOrder.isFullyFilled()) {
+                level.poll();
+            }
             order.processFill(fill);
             if (order.isFullyFilled()) {
                 return fills;
