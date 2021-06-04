@@ -4,11 +4,34 @@ import java.util.*;
 
 public class BookSide {
     private final Side side;
-    private final SortedSet<PriceLevel> priceLevels = new TreeSet<>();
-    private final Map<Long, PriceLevel> priceLevelMap = new HashMap<>();
+
+    // We use a sorted set when matching an order so that finding the first order takes O(1)
+    // Inserting or removing a new price level will take O(log(n)) that is an acceptable trade-off
+    // since we will be reading price levels much more frequently that we would be inserting and removing them
+    private final SortedSet<PriceLevel> priceLevelsSorted = new TreeSet<>();
+
+    // We use a hashmap when posting an order so that it can be done in O(1)
+    private final Map<Price, PriceLevel> priceLevelsMapped = new HashMap<>();
 
     public BookSide(Side side) {
         this.side = side;
+    }
+
+    public void postOrder(Order order) {
+        if (order.side() != this.side) {
+            throw new MatchingEngineException("Order and book sides don't match");
+        }
+        if (order.type() == OrderType.MARKET) {
+            throw new MatchingEngineException("Market orders cannot be posted");
+        }
+        Price price = order.limitPrice();
+        PriceLevel level = priceLevelsMapped.get(price);
+        if (level == null) {
+            level = new PriceLevel(order.limitPrice());
+            priceLevelsSorted.add(level);
+            priceLevelsMapped.put(price, level);
+        }
+        level.putOrder(order);
     }
 
     public List<Fill> attemptToFill(Order order) {
@@ -17,7 +40,7 @@ public class BookSide {
             throw new MatchingEngineException("Order and book sides do not match. orderSide=" + order.side() + " bookSide=" + this.side);
         }
         // Try to match the order
-        Iterator<PriceLevel> iterator = priceLevels.iterator();
+        Iterator<PriceLevel> iterator = priceLevelsSorted.iterator();
         List<Fill> fills = new ArrayList<>();
         while (iterator.hasNext()) {
             PriceLevel level = iterator.next();
