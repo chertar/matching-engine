@@ -31,7 +31,7 @@ public class BookSide {
             priceLevelsSorted.add(level);
             priceLevelsMapped.put(price, level);
         }
-        level.putOrder(order);
+        level.postOrder(order);
     }
 
     public List<Fill> attemptToFill(Order order) {

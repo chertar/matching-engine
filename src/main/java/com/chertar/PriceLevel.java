@@ -12,7 +12,7 @@ public class PriceLevel {
     public Price price() {
         return price;
     }
-    public void putOrder(Order order) {
+    public void postOrder(Order order) {
         Objects.requireNonNull(order);
         if(order.type() == OrderType.MARKET) {
             throw new MatchingEngineException("Market order cannot be posted");
