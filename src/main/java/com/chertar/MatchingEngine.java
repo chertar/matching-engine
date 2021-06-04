@@ -17,10 +17,18 @@ public class MatchingEngine {
     public List<Fill> attemptToFill(Order order) {
         Side side = order.side();
         if (side == Side.BUY) {
-            return bids.attemptToFill(order);
+            List<Fill> fills =  asks.attemptToFill(order);
+            if (!order.isFullyFilled()) {
+                bids.postOrder(order);
+            }
+            return fills;
         }
         else if (side == Side.SELL) {
-            return asks.attemptToFill(order);
+            List<Fill> fills = bids.attemptToFill(order);
+            if (!order.isFullyFilled()) {
+                asks.postOrder(order);
+            }
+            return fills;
         }
         else {
             throw new MatchingEngineException("Unsupoorted side: " + side);

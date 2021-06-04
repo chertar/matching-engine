@@ -20,6 +20,9 @@ public class PriceLevel {
         if (!order.limitPrice().equalsPrice(this.price)) {
             throw new MatchingEngineException("Order and level prices don't match.");
         }
+        if (orders.contains(order)) {
+            throw new MatchingEngineException("Order is already posted");
+        }
         orders.offer(order);
     }
 

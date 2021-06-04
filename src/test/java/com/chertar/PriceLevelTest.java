@@ -23,7 +23,7 @@ public class PriceLevelTest extends TestCase {
 
         // Add second order and verify queue size
         Order order2 = new Order(Side.BUY, OrderType.LIMIT, 100.25, 20);
-        level.putOrder(order1);
+        level.putOrder(order2);
         assertThat(level.queueSize()).isEqualTo(2);
 
         // Verify peek returns first order
