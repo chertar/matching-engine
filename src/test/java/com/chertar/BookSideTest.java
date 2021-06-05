@@ -15,7 +15,7 @@ public class BookSideTest extends TestCase {
                 limit(Side.BUY, 100, 100.25)),
                 sidedQuote(100.25, 100));
 
-        testPermutation(Side.SELL, list(
+        testPermutation(Side.BUY, list(
                 limit(Side.BUY, 50, 100.25),
                 limit(Side.BUY, 100, 100.25)),
                 sidedQuote(100.25, 150));
