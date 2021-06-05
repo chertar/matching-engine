@@ -14,27 +14,13 @@ public class MatchingEngine {
         this.instrument = instrument;
     }
 
-    public List<Fill> attemptToFill(Order order) {
-        Side side = order.side();
-        if (side == Side.BUY) {
-            List<Fill> fills =  asks.attemptToFill(order);
-            if (!order.isFullyFilled()) {
-                bids.postOrder(order);
-            }
-            return fills;
+    public List<Fill> incomingOrder(Order order) {
+        BookSide oppositeBookSide = order.side().isBuy() ? asks : bids;
+        BookSide sameBookSide = order.side().isBuy() ? bids : asks;
+        List<Fill> fills = oppositeBookSide.attemptToFill(order);
+        if (order.isFullyFilled()){
+            sameBookSide.postOrder(order);
         }
-        else if (side == Side.SELL) {
-            List<Fill> fills = bids.attemptToFill(order);
-            if (!order.isFullyFilled()) {
-                asks.postOrder(order);
-            }
-            return fills;
-        }
-        else {
-            throw new MatchingEngineException("Unsupoorted side: " + side);
-        }
-    }
-    public void post(Order order) {
-        // TODO
+        return fills;
     }
 }

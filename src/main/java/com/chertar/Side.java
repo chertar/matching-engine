@@ -1,5 +1,12 @@
 package com.chertar;
 
 public enum Side {
-    BUY, SELL;
+    BUY(true), SELL(false);
+    private boolean isBuy;
+    Side(boolean isBuy) {
+        this.isBuy = isBuy;
+    }
+    public boolean isBuy() {
+        return this.isBuy;
+    }
 }
