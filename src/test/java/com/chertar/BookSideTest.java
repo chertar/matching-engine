@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.util.Lists.list;
 
 
@@ -58,6 +59,34 @@ public class BookSideTest extends TestCase {
                 sidedQuote(99.0, 10));
     }
 
+    public void testPostingInvalidOrders() {
+        // Try posting a sell order into a buy BookSide
+        {
+            Order order = limit(Side.SELL, 10, 100.25);
+            BookSide bookSide = new BookSide(Side.BUY);
+            assertThatExceptionOfType(MatchingEngineException.class)
+                    .isThrownBy(() -> bookSide.postOrder(order))
+                    .withMessageContaining("Order and book sides don't match");
+        }
+
+        //Try posting a buy order into a sell BookSide
+        {
+            Order order = limit(Side.BUY, 10, 100.25);
+            BookSide bookSide = new BookSide(Side.SELL);
+            assertThatExceptionOfType(MatchingEngineException.class)
+                    .isThrownBy(() -> bookSide.postOrder(order))
+                    .withMessageContaining("Order and book sides don't match");
+        }
+        //Try posting a market order
+        {
+            Order order = market(Side.BUY, 10);
+            BookSide bookSide = new BookSide(Side.BUY);
+            assertThatExceptionOfType(MatchingEngineException.class)
+                    .isThrownBy(() -> bookSide.postOrder(order))
+                    .withMessageContaining("Market orders cannot be posted");
+        }
+    }
+
     private static void testPermutation(Side side, List<Order> orders, BookSide.SidedQuote expectedQuote) {
         BookSide bookSide = new BookSide(side);
         for (Order order : orders) {
@@ -71,6 +100,9 @@ public class BookSideTest extends TestCase {
     }
     public static Order limit(Side side,  long qty, double price) {
         return new Order(side, OrderType.LIMIT, qty, price);
+    }
+    public static Order market(Side side,  long qty) {
+        return new Order(side, OrderType.MARKET, qty, Double.NaN);
     }
     public static BookSide.SidedQuote sidedQuote(double price, long qty) {
         return new BookSide.SidedQuote(Price.of(price), qty);
