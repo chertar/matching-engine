@@ -2,25 +2,33 @@ package com.chertar;
 
 import junit.framework.TestCase;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.util.Lists.list;
 
 
 public class BookSideTest extends TestCase {
 
     public void testPostOrder() {
+        testPermutation(list(limit(Side.BUY, 100, 100.25)), sidedQuote(100.25, 100));
+    }
+
+    private static void testPermutation(List<Order> orders, BookSide.SidedQuote expectedQuote) {
         BookSide bookSide = new BookSide(Side.BUY);
-        Order order = limit(Side.BUY, 100, "BTC-USD",100.25 );
-        bookSide.postOrder(order);
+        for (Order order : orders) {
+            bookSide.postOrder(order);
+        }
         BookSide.SidedQuote quote = bookSide.bestBidOffer();
-        assertThat(quote).isEqualTo(halfQuote(100.25, 100));
+        assertThat(quote).isEqualTo(expectedQuote);
     }
 
     public void testAttemptToFill() {
     }
-    public Order limit(Side side,  long qty, String instrument, double price) {
+    public static Order limit(Side side,  long qty, double price) {
         return new Order(side, OrderType.LIMIT, qty, price);
     }
-    public BookSide.SidedQuote halfQuote(double price, long qty) {
+    public static BookSide.SidedQuote sidedQuote(double price, long qty) {
         return new BookSide.SidedQuote(Price.of(price), qty);
     }
 }
