@@ -2,6 +2,8 @@ package com.chertar;
 
 import junit.framework.TestCase;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,6 +99,17 @@ public class BookSideTest extends TestCase {
     }
 
     public void testAttemptToFill() {
+        BookSide bookSide = new BookSide(Side.BUY);
+        bookSide.postOrder(limit(Side.BUY, 100, 100.25));
+        // Exact price
+        List<Fill> fills = bookSide.attemptToFill(limit(Side.SELL, 10, 100.25));
+        assertThat(fills).containsExactly(Fill.from(100.25, 10));
+        assertThat(bookSide.bestBidOffer()).isEqualTo(BookSide.SidedQuote.from(90, 100.25));
+
+
+
+
+
     }
     public static Order limit(Side side,  long qty, double price) {
         return new Order(side, OrderType.LIMIT, qty, price);

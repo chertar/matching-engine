@@ -1,5 +1,7 @@
 package com.chertar;
 
+import java.util.Objects;
+
 public class Fill {
     private final Price price;
     private final long qty;
@@ -20,5 +22,26 @@ public class Fill {
     }
     public Price price() {
         return price;
+    }
+
+    @Override
+    public String toString() {
+        return "Fill{" +
+                "price=" + price +
+                ", qty=" + qty +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Fill fill = (Fill) o;
+        return qty == fill.qty && price.equals(fill.price);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(price, qty);
     }
 }

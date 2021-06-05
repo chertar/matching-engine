@@ -40,7 +40,7 @@ public class BookSide {
 
     public List<Fill> attemptToFill(Order order) {
         Objects.requireNonNull(order);
-        if (order.side() != this.side) {
+        if (order.side().isBuy() == side.isBuy()) {
             throw new MatchingEngineException("Order and book sides do not match. orderSide=" + order.side() + " bookSide=" + this.side);
         }
         // Try to match the order
@@ -92,6 +92,10 @@ public class BookSide {
     public static class SidedQuote {
         private final Price price;
         private final long qty;
+
+        public static SidedQuote from(long qty, double price) {
+            return new SidedQuote(Price.of(price), qty);
+        }
 
         public SidedQuote(Price price, long qty) {
             this.price = price;
