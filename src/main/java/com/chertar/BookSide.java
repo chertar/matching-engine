@@ -115,6 +115,14 @@ public class BookSide {
         public int hashCode() {
             return price.hashCode();
         }
+
+        @Override
+        public String toString() {
+            return "SidedQuote{" +
+                    "price=" + price +
+                    ", qty=" + qty +
+                    '}';
+        }
     }
 
 }

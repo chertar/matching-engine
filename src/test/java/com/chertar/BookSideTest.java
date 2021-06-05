@@ -11,7 +11,20 @@ import static org.assertj.core.util.Lists.list;
 public class BookSideTest extends TestCase {
 
     public void testPostOrder() {
-        testPermutation(list(limit(Side.BUY, 100, 100.25)), sidedQuote(100.25, 100));
+        testPermutation(list(
+                limit(Side.BUY, 100, 100.25)),
+                sidedQuote(100.25, 100));
+
+        testPermutation(list(
+                limit(Side.BUY, 50, 100.25),
+                limit(Side.BUY, 100, 100.25)),
+                sidedQuote(100.25, 150));
+
+        testPermutation(list(
+                limit(Side.BUY, 50, 100.25),
+                limit(Side.BUY, 100, 100.25),
+                limit(Side.BUY, 25, 101.0)),
+                sidedQuote(101.0, 25));
     }
 
     private static void testPermutation(List<Order> orders, BookSide.SidedQuote expectedQuote) {
