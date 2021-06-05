@@ -16,7 +16,7 @@ public class BookSide {
 
     public BookSide(Side side) {
         this.side = side;
-        this.priceComparator = side.isBuy() ? new DescendingComparator() : new AscendingComparator();
+        this.priceComparator = side.isBuy() ? PriceComparator.descending() : PriceComparator.ascending();
         Comparator<PriceLevel> levelComparator = new LevelComparator(priceComparator);
          this.priceLevelsSorted= new TreeSet<PriceLevel>(levelComparator);
     }
