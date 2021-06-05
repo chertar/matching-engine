@@ -104,19 +104,39 @@ public class BookSideTest extends TestCase {
     }
 
     public void testAttemptToFill() {
-        BookSide bookSide = new BookSide(Side.BUY);
-        bookSide.postOrder(limit(Side.BUY, 100, 100.25));
-
         // Exact price and qty
-        List<Fill> fills = bookSide.attemptToFill(limit(Side.SELL, 100, 100.25));
-        assertThat(fills).containsExactly(Fill.from(100.25, 100));
-        assertThat(bookSide.bestBidOffer()).isEqualTo(BookSide.SidedQuote.from(0, Double.NaN));
+        testPermutation(Side.BUY,
+                        list(limit(Side.BUY, 100, 100.25)),
+                        limit(Side.SELL, 100, 100.25),
+                        list(Fill.from(100.25, 100)),
+                        BookSide.SidedQuote.from(0, Double.NaN));
 
+        // Incoming order price is more aggressive
+        testPermutation(Side.BUY,
+                list(limit(Side.BUY, 100, 100.25)),
+                limit(Side.SELL, 100, 100.10),
+                list(Fill.from(100.25, 100)),
+                BookSide.SidedQuote.from(0, Double.NaN));
 
-
-
+        // Incoming order price is more passive
+        testPermutation(Side.BUY,
+                list(limit(Side.BUY, 100, 100.25)),
+                limit(Side.SELL, 100, 100.50),
+                list(),
+                BookSide.SidedQuote.from(100, 100.25));
 
     }
+
+    private static void testPermutation(Side side, List<Order> restingOrders, Order incomingOrder, List<Fill> expectedFills, BookSide.SidedQuote expectedQuote) {
+        BookSide bookSide = new BookSide(side);
+        for (Order order : restingOrders) {
+            bookSide.postOrder(order);
+        }
+        List<Fill> fills = bookSide.attemptToFill(incomingOrder);
+        assertThat(fills).containsExactlyElementsOf(expectedFills);
+        assertThat(bookSide.bestBidOffer()).isEqualTo(expectedQuote);
+    }
+
     public static Order limit(Side side,  long qty, double price) {
         return new Order(side, OrderType.LIMIT, qty, price);
     }
