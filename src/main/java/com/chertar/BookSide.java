@@ -48,18 +48,17 @@ public class BookSide {
         List<Fill> fills = new ArrayList<>();
         while (iterator.hasNext()) {
             PriceLevel level = iterator.next();
-            if (order.type() == OrderType.MARKET ) {
-                List<Fill> newFills = generateFills(order, level, level.price());
-                fills.addAll(newFills);
-            }
-            else if (order.type() == OrderType.LIMIT) {
-                if (priceComparator.compare(order.limitPrice(), level.price()) >= 0) {
+            if (order.type() == OrderType.MARKET
+                || (order.type() == OrderType.LIMIT && priceComparator.compare(order.limitPrice(), level.price()) >= 0)) {
                     List<Fill> newFills = generateFills(order, level, level.price());
                     fills.addAll(newFills);
-                }
-                else {
-                    break;
-                }
+            }
+            if (level.queueSize() == 0) {
+                iterator.remove();
+                priceLevelsMapped.remove(level.price());
+            }
+            if (order.isFullyFilled()) {
+                break;
             }
         }
         return fills;

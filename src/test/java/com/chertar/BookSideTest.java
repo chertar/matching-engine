@@ -41,6 +41,8 @@ public class BookSideTest extends TestCase {
     }
 
     public void testPostingSellOrders() {
+        testPermutation(Side.SELL, list(), sidedQuote(Double.NaN, 0));
+
         testPermutation(Side.SELL, list(
                 limit(Side.SELL, 100, 100.25)),
                 sidedQuote(100.25, 100));
@@ -108,7 +110,7 @@ public class BookSideTest extends TestCase {
         // Exact price and qty
         List<Fill> fills = bookSide.attemptToFill(limit(Side.SELL, 100, 100.25));
         assertThat(fills).containsExactly(Fill.from(100.25, 100));
-        assertThat(bookSide.bestBidOffer()).isEqualTo(BookSide.SidedQuote.from(90, 100.25));
+        assertThat(bookSide.bestBidOffer()).isEqualTo(BookSide.SidedQuote.from(0, Double.NaN));
 
 
 
