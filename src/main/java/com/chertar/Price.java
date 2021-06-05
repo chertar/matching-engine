@@ -2,7 +2,7 @@ package com.chertar;
 
 import java.math.BigDecimal;
 
-public class Price implements Comparable<Price>{
+public class Price {
     private final long base;
     private static final int DENOMINATOR = 100;
     private final double doubleValue;
@@ -21,10 +21,6 @@ public class Price implements Comparable<Price>{
     }
 
     @Override
-    public int compareTo(Price o) {
-        return (int) (base - o.base);
-    }
-    @Override
     public boolean equals(Object o) {
         if (!(o instanceof Price)) {
             return false;
@@ -36,20 +32,11 @@ public class Price implements Comparable<Price>{
     public int hashCode() {
         return Long.valueOf(base).hashCode();
     }
-    public boolean equalsPrice(Price price) {
-        return price.base == this.base;
+
+    long base() {
+        return this.base;
     }
-    public boolean isMoreAggressiveThan(Price otherPrice, Side side) {
-        if (side == Side.BUY) {
-            return this.base > otherPrice.base;
-        }
-        else if (side == Side.SELL) {
-            return this.base < otherPrice.base;
-        }
-        else {
-            throw new MatchingEngineException("Unsupported side " + side);
-        }
-    }
+
     @Override
     public String toString() {
         return String.format("%.02f", doubleValue);

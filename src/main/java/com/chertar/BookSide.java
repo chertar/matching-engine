@@ -4,17 +4,21 @@ import java.util.*;
 
 public class BookSide {
     private final Side side;
+    private Comparator<Price> priceComparator;
 
     // We use a sorted set when matching an order so that finding the first order takes O(1)
     // Inserting or removing a new price level will take O(log(n)) that is an acceptable trade-off
     // since we will be reading price levels much more frequently that we would be inserting and removing them
-    private final SortedSet<PriceLevel> priceLevelsSorted = new TreeSet<>();
+    private final SortedSet<PriceLevel> priceLevelsSorted;
 
     // We use a hashmap when posting an order so that it can be done in O(1)
     private final Map<Price, PriceLevel> priceLevelsMapped = new HashMap<>();
 
     public BookSide(Side side) {
         this.side = side;
+        this.priceComparator = side.isBuy() ? new DescendingComparator() : new AscendingComparator();
+        Comparator<PriceLevel> levelComparator = new LevelComparator(priceComparator);
+         this.priceLevelsSorted= new TreeSet<PriceLevel>(levelComparator);
     }
 
     public void postOrder(Order order) {
@@ -49,11 +53,7 @@ public class BookSide {
                 fills.addAll(newFills);
             }
             else if (order.type() == OrderType.LIMIT) {
-                if (order.limitPrice().equals(level.price())) {
-                    List<Fill> newFills = generateFills(order, level, level.price());
-                    fills.addAll(newFills);
-                }
-                else if (order.limitPrice().isMoreAggressiveThan(level.price(), side)) {
+                if (priceComparator.compare(order.limitPrice(), level.price()) >= 0) {
                     List<Fill> newFills = generateFills(order, level, level.price());
                     fills.addAll(newFills);
                 }

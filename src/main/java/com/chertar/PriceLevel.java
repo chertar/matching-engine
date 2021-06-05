@@ -2,7 +2,7 @@ package com.chertar;
 
 import java.util.*;
 
-public class PriceLevel implements Comparable<PriceLevel> {
+public class PriceLevel {
     private final Price price;
     private final Queue<Order> orders = new ArrayDeque<>();
 
@@ -17,7 +17,7 @@ public class PriceLevel implements Comparable<PriceLevel> {
         if(order.type() == OrderType.MARKET) {
             throw new MatchingEngineException("Market order cannot be posted");
         }
-        if (!order.limitPrice().equalsPrice(this.price)) {
+        if (!order.limitPrice().equals(this.price)) {
             throw new MatchingEngineException("Order and level prices don't match.");
         }
         if (orders.contains(order)) {
@@ -39,10 +39,5 @@ public class PriceLevel implements Comparable<PriceLevel> {
     public long qty() {
         //TODO: cache this so it can be returned in O(1)
         return this.orders.stream().mapToLong(order -> order.leavesQty()).sum();
-    }
-
-    @Override
-    public int compareTo(PriceLevel o) {
-        return price.compareTo(o.price);
     }
 }
