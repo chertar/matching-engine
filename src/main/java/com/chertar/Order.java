@@ -9,7 +9,7 @@ public class Order {
     private Price avgPrice = Price.of(0.0);
     private long filledQty;
 
-    public Order(Side side, OrderType type, double limitPrice, long qty) {
+    public Order(Side side, OrderType type,  long qty, double limitPrice) {
         this.side = side;
         this.type = type;
         this.limitPrice = Price.of(limitPrice);

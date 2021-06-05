@@ -83,4 +83,38 @@ public class BookSide {
         }
         throw new MatchingEngineException("There should have been at least one fill");
     }
+    public SidedQuote bestBidOffer() {
+        PriceLevel level = this.priceLevelsSorted.first();
+        SidedQuote quote = new SidedQuote(level.price(), level.qty());
+        return quote;
+    }
+
+    public static class SidedQuote {
+        private final Price price;
+        private final long qty;
+
+        public SidedQuote(Price price, long qty) {
+            this.price = price;
+            this.qty = qty;
+        }
+        public Price price() {
+            return this.price;
+        }
+        public long qty() {
+            return this.qty;
+        }
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof SidedQuote)) {
+                return false;
+            }
+            SidedQuote other = (SidedQuote) o;
+            return other.price.equals(price) && other.qty == qty;
+        }
+        @Override
+        public int hashCode() {
+            return price.hashCode();
+        }
+    }
+
 }

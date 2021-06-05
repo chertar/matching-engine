@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.*;
 public class OrderTest extends TestCase {
 
     public void testGetters() {
-        Order order = new Order(Side.BUY, OrderType.LIMIT, 100.01, 10);
+        Order order = new Order(Side.BUY, OrderType.LIMIT,  10, 100.01);
         assertThat(order.side()).isEqualTo(Side.BUY);
         assertThat(order.type()).isEqualTo(OrderType.LIMIT);
         assertThat(order.limitPrice().doubleValue()).isCloseTo(100.01, within(0.001));
@@ -15,7 +15,7 @@ public class OrderTest extends TestCase {
     }
 
     public void testProcessFill() {
-        Order order = new Order(Side.BUY, OrderType.LIMIT, 100.00, 10);
+        Order order = new Order(Side.BUY, OrderType.LIMIT,  10, 100.00);
 
         // First fill
         {
