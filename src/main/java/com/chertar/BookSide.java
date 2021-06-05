@@ -84,6 +84,9 @@ public class BookSide {
         throw new MatchingEngineException("There should have been at least one fill");
     }
     public SidedQuote bestBidOffer() {
+        if (priceLevelsSorted.isEmpty()){
+            return SidedQuote.nullQuote();
+        }
         PriceLevel level = this.priceLevelsSorted.first();
         SidedQuote quote = new SidedQuote(level.price(), level.qty());
         return quote;
@@ -92,9 +95,14 @@ public class BookSide {
     public static class SidedQuote {
         private final Price price;
         private final long qty;
+        private static final SidedQuote nullQuote = from(0, Double.NaN);
 
         public static SidedQuote from(long qty, double price) {
             return new SidedQuote(Price.of(price), qty);
+        }
+
+        public static SidedQuote nullQuote() {
+            return nullQuote;
         }
 
         public SidedQuote(Price price, long qty) {

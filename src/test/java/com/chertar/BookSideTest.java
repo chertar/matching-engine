@@ -1,6 +1,7 @@
 package com.chertar;
 
 import junit.framework.TestCase;
+import org.assertj.core.util.Lists;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,6 +15,8 @@ import static org.assertj.core.util.Lists.list;
 public class BookSideTest extends TestCase {
 
     public void testPostingBuyOrders() {
+        testPermutation(Side.BUY, list(), sidedQuote(Double.NaN, 0));
+
         testPermutation(Side.BUY, list(
                 limit(Side.BUY, 100, 100.25)),
                 sidedQuote(100.25, 100));
@@ -101,9 +104,10 @@ public class BookSideTest extends TestCase {
     public void testAttemptToFill() {
         BookSide bookSide = new BookSide(Side.BUY);
         bookSide.postOrder(limit(Side.BUY, 100, 100.25));
-        // Exact price
-        List<Fill> fills = bookSide.attemptToFill(limit(Side.SELL, 10, 100.25));
-        assertThat(fills).containsExactly(Fill.from(100.25, 10));
+
+        // Exact price and qty
+        List<Fill> fills = bookSide.attemptToFill(limit(Side.SELL, 100, 100.25));
+        assertThat(fills).containsExactly(Fill.from(100.25, 100));
         assertThat(bookSide.bestBidOffer()).isEqualTo(BookSide.SidedQuote.from(90, 100.25));
 
 
