@@ -1,5 +1,7 @@
-package com.chertar;
+package com.chertar.util;
 
+import com.chertar.util.Price;
+import com.chertar.util.PriceComparator;
 import junit.framework.TestCase;
 
 import java.util.Comparator;

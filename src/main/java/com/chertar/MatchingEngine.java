@@ -1,10 +1,21 @@
 package com.chertar;
 
+import com.chertar.util.Instrument;
+import com.chertar.util.OrderType;
+import com.chertar.util.Side;
+
 import java.util.*;
 
 /**
  * This class is the entry-point into the Matching Engine and provides a way to submit orders,
  * receive fills and query top of book market data.  The engine supports Limit and Market orders.
+ *
+ * Time complexity
+ *  - matching time complexity O(n) where "n" is the number of fills.
+ *  - posting time complexity is O(1)
+ *
+ * The pricing engine support a single instrument.  So three matching engine instances would
+ * be created to support "BTC-USD", "ETH-USD", "ETH-BTC"
  *
  * This simple implementation does not currently support canceling and amending orders, but it
  * can be exended to do so.  A trivial implementation of amending and canceling would be O(n),

@@ -1,7 +1,11 @@
-package com.chertar;
+package com.chertar.util;
 
-import java.math.BigDecimal;
-
+/**
+ * A representation of an instrument's price that supports decimal points but
+ * unlike Java double, can be compared without needing to adjust for precision.
+ * This class is used for storing and sorting prices in the order book and is
+ * key to reducing time complexity.
+ */
 public class Price {
     private final long base;
     private static final int DENOMINATOR = 100;

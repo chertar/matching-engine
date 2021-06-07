@@ -1,5 +1,6 @@
-package com.chertar;
+package com.chertar.util;
 
+import com.chertar.util.Price;
 import junit.framework.TestCase;
 
 import static org.assertj.core.api.Assertions.assertThat;

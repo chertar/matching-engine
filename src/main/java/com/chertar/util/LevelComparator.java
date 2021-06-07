@@ -1,4 +1,6 @@
-package com.chertar;
+package com.chertar.util;
+
+import com.chertar.PriceLevel;
 
 import java.util.Comparator;
 

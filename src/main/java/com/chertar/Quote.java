@@ -1,5 +1,11 @@
 package com.chertar;
 
+import com.chertar.util.Price;
+
+/**
+ * Represents the top view of an order book, holding the best bid or ask
+ * and total qty
+ * */
 public class Quote {
     private final Price price;
     private final long qty;

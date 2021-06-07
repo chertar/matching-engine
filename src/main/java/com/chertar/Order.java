@@ -1,5 +1,10 @@
 package com.chertar;
 
+import com.chertar.util.MatchingEngineException;
+import com.chertar.util.OrderType;
+import com.chertar.util.Price;
+import com.chertar.util.Side;
+
 public class Order {
     private final Side side;
     private final OrderType type;

@@ -1,5 +1,9 @@
 package com.chertar;
 
+import com.chertar.util.MatchingEngineException;
+import com.chertar.util.OrderType;
+import com.chertar.util.Price;
+import com.chertar.util.Side;
 import junit.framework.TestCase;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -1,4 +1,4 @@
-package com.chertar;
+package com.chertar.util;
 
 public enum OrderType {
     LIMIT, MARKET;

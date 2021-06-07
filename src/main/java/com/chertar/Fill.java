@@ -1,5 +1,7 @@
 package com.chertar;
 
+import com.chertar.util.Price;
+
 import java.util.Objects;
 
 public class Fill {

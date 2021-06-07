@@ -1,7 +1,11 @@
 package com.chertar;
 
-import static com.chertar.Side.*;
+import static com.chertar.util.Side.*;
 
+import com.chertar.util.MatchingEngineException;
+import com.chertar.util.OrderType;
+import com.chertar.util.Price;
+import com.chertar.util.Side;
 import junit.framework.TestCase;
 import org.junit.Test;
 

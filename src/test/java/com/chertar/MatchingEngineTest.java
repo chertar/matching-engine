@@ -1,7 +1,11 @@
 package com.chertar;
 
-import static com.chertar.Side.*;
+import static com.chertar.util.Side.*;
 
+import com.chertar.util.Instrument;
+import com.chertar.util.OrderType;
+import com.chertar.util.Price;
+import com.chertar.util.Side;
 import junit.framework.TestCase;
 
 import java.util.List;
@@ -213,7 +217,7 @@ public class MatchingEngineTest extends TestCase {
         return Fill.from(price, qty);
     }
 
-    public static Order market(Side side,  long qty) {
+    public static Order market(Side side, long qty) {
         return new Order(side, OrderType.MARKET, qty, Double.NaN);
     }
 
