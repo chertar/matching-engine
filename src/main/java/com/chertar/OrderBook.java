@@ -2,6 +2,12 @@ package com.chertar;
 
 import java.util.*;
 
+/**
+ * Represents one side of the Matching Engine, either bids or asks.  It maintains a collection Price Levels
+ * and contains logic for:
+ * - matching an incoming opposite-side order against existing order
+ * - posting a same-side order to the appropriate price leve
+ */
 public class OrderBook {
     private final Side side;
     private Comparator<Price> priceComparator;

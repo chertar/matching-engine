@@ -2,6 +2,10 @@ package com.chertar;
 
 import java.util.*;
 
+/**
+ * Responsible for keeping maintaining a fifo queue of resting orders and calculating their cumulative
+ * qty
+ */
 public class PriceLevel {
     private final Price price;
     private final Queue<Order> orders = new ArrayDeque<>();
@@ -37,7 +41,10 @@ public class PriceLevel {
     }
 
     public long qty() {
-        //TODO: cache this so it can be returned in O(1)
+        // This is a O(n) implementation where n is the number of orders in the queue
+        // In a production implementation, I would implement it in O(1) by keeping
+        // the qty in the object state and incrementing or decrementing it when
+        // orders are posted, filled, amended and cancelled
         return this.orders.stream().mapToLong(order -> order.leavesQty()).sum();
     }
 }

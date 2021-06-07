@@ -229,7 +229,7 @@ public class MatchingEngineTest extends TestCase {
     }
 
     private void submitOrderAndVerifyFills(Side side, OrderType type, long qty, double price, List<Fill> expectedFills) {
-        List<Fill> fills = engine.incomingOrder(new Order(side, type, qty, price));
+        List<Fill> fills = engine.process(new Order(side, type, qty, price));
         assertThat(fills).containsExactlyElementsOf(expectedFills);
     }
 
