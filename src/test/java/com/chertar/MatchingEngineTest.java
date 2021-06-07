@@ -134,6 +134,46 @@ public class MatchingEngineTest extends TestCase {
         assertQuote(25, 11.0, 0, Double.NaN);
     }
 
+    public void testSellMarketOrders() {
+        buildOrderBook();
+
+        /*
+        Expected order book
+         bidQty     bidPrice    askQty      askPrice
+         25         11.0        40          14.0
+         100, 50    10.0        80, 30      15.0
+         200        9.0         300         16.0     */
+
+        // First order, depletes two price levels
+        market(SELL, 100, list(
+                fill(25, 11.0),
+                fill(75, 10.0)));
+
+        /*
+        Expected order book
+         bidQty     bidPrice    askQty      askPrice
+         25, 50     10.0        40          14.0
+         200        9.0         80, 30      15.0
+                                300         16.0     */
+
+        assertQuote(75, 10.0, 40, 14.0);
+
+        // Second order should deplete the order book and not post
+        market(SELL, 1000, list(
+                fill(25, 10.0),
+                fill(50, 10.0),
+                fill(200, 9.0)));
+
+        /*
+        Expected order book
+         bidQty     bidPrice    askQty      askPrice
+         0          NaN         40          14.0
+                                80, 30      15.0
+                                300         16.0     */
+
+        assertQuote(0, Double.NaN, 40, 14.0);
+    }
+
     /** creates order book:
      bidQty     bidPrice    askQty      askPrice
      25         11.0        40          14.0
