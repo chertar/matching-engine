@@ -1,5 +1,7 @@
 package com.chertar;
 
+import static com.chertar.Side.*;
+
 import junit.framework.TestCase;
 
 import java.util.List;
@@ -11,120 +13,127 @@ import static org.assertj.core.util.Lists.list;
 
 public class OrderBookTest extends TestCase {
 
-    public void testPostingBuyOrders() {
-        testPermutation(Side.BUY, list(), sidedQuote(Double.NaN, 0));
+    public void testPosting() {
+        // BUYS
+        testPermutation(BUY, list(), quote(0, Double.NaN));
 
-        testPermutation(Side.BUY, list(
-                limit(Side.BUY, 100, 100.25)),
-                sidedQuote(100.25, 100));
+        testPermutation(BUY, list(
+                limit(BUY, 100, 100.25)),
+                quote(100, 100.25));
 
-        testPermutation(Side.BUY, list(
-                limit(Side.BUY, 50, 100.25),
-                limit(Side.BUY, 100, 100.25)),
-                sidedQuote(100.25, 150));
+        testPermutation(BUY, list(
+                limit(BUY, 50, 100.25),
+                limit(BUY, 100, 100.25)),
+                quote(150, 100.25));
 
-        testPermutation(Side.BUY, list(
-                limit(Side.BUY, 50, 100.25),
-                limit(Side.BUY, 100, 100.25),
-                limit(Side.BUY, 25, 101.0)),
-                sidedQuote(101.0, 25));
+        testPermutation(BUY, list(
+                limit(BUY, 50, 100.25),
+                limit(BUY, 100, 100.25),
+                limit(BUY, 25, 101.0)),
+                quote(25, 101.0));
 
-        testPermutation(Side.BUY, list(
-                limit(Side.BUY, 50, 100.25),
-                limit(Side.BUY, 100, 100.25),
-                limit(Side.BUY, 25, 101.0),
-                limit(Side.BUY, 10, 99.0)),
-                sidedQuote(101.0, 25));
-    }
+        testPermutation(BUY, list(
+                limit(BUY, 50, 100.25),
+                limit(BUY, 100, 100.25),
+                limit(BUY, 25, 101.0),
+                limit(BUY, 10, 99.0)),
+                quote(25, 101.0));
 
-    public void testPostingSellOrders() {
-        testPermutation(Side.SELL, list(), sidedQuote(Double.NaN, 0));
+        // SELLS
+        testPermutation(SELL,
+                        list(),
+                        quote( 0, Double.NaN));
 
-        testPermutation(Side.SELL, list(
-                limit(Side.SELL, 100, 100.25)),
-                sidedQuote(100.25, 100));
+        testPermutation(SELL, list(
+                limit(SELL, 100, 100.25)),
+                quote(100, 100.25));
 
-        testPermutation(Side.SELL, list(
-                limit(Side.SELL, 50, 100.25),
-                limit(Side.SELL, 100, 100.25)),
-                sidedQuote(100.25, 150));
+        testPermutation(SELL, list(
+                limit(SELL, 50, 100.25),
+                limit(SELL, 100, 100.25)),
+                quote( 150, 100.25));
 
-        testPermutation(Side.SELL, list(
-                limit(Side.SELL, 50, 100.25),
-                limit(Side.SELL, 100, 100.25),
-                limit(Side.SELL, 25, 101.0)),
-                sidedQuote(100.25, 150));
+        testPermutation(SELL, list(
+                limit(SELL, 50, 100.25),
+                limit(SELL, 100, 100.25),
+                limit(SELL, 25, 101.0)),
+                quote(150, 100.25));
 
-        testPermutation(Side.SELL, list(
-                limit(Side.SELL, 50, 100.25),
-                limit(Side.SELL, 100, 100.25),
-                limit(Side.SELL, 25, 101.0),
-                limit(Side.SELL, 10, 99.0)),
-                sidedQuote(99.0, 10));
+        testPermutation(SELL, list(
+                limit(SELL, 50, 100.25),
+                limit(SELL, 100, 100.25),
+                limit(SELL, 25, 101.0),
+                limit(SELL, 10, 99.0)),
+                quote(10, 99.0));
     }
 
     public void testPostingInvalidOrders() {
-        // Try posting a sell order into a buy BookSide
+        // Try posting a sell order into a bids OrderBook
         {
-            Order order = limit(Side.SELL, 10, 100.25);
-            OrderBook orderBook = new OrderBook(Side.BUY);
+            Order order = limit(SELL, 10, 100.25);
+            OrderBook orderBook = new OrderBook(BUY);
             assertThatExceptionOfType(MatchingEngineException.class)
                     .isThrownBy(() -> orderBook.post(order))
                     .withMessageContaining("Order and book sides don't match");
         }
 
-        //Try posting a buy order into a sell BookSide
+        //Try posting a buy order into an asks BookSide
         {
-            Order order = limit(Side.BUY, 10, 100.25);
-            OrderBook orderBook = new OrderBook(Side.SELL);
+            Order order = limit(BUY, 10, 100.25);
+            OrderBook orderBook = new OrderBook(SELL);
             assertThatExceptionOfType(MatchingEngineException.class)
                     .isThrownBy(() -> orderBook.post(order))
                     .withMessageContaining("Order and book sides don't match");
         }
         //Try posting a market order
         {
-            Order order = market(Side.BUY, 10);
-            OrderBook orderBook = new OrderBook(Side.BUY);
+            Order order = market(BUY, 10);
+            OrderBook orderBook = new OrderBook(BUY);
             assertThatExceptionOfType(MatchingEngineException.class)
                     .isThrownBy(() -> orderBook.post(order))
                     .withMessageContaining("Market orders cannot be posted");
         }
     }
 
-    private static void testPermutation(Side side, List<Order> orders, OrderBook.BookQuote expectedQuote) {
+    private static void testPermutation(Side side, List<Order> orders, Quote expectedQuote) {
         OrderBook orderBook = new OrderBook(side);
         for (Order order : orders) {
             orderBook.post(order);
         }
-        OrderBook.BookQuote quote = orderBook.topQuote();
+        Quote quote = orderBook.topQuote();
         assertThat(quote).isEqualTo(expectedQuote);
     }
 
-    public void testAttemptToFill() {
-        // Exact price and qty
-        testPermutation(Side.BUY,
-                        list(limit(Side.BUY, 100, 100.25)),
-                        limit(Side.SELL, 100, 100.25),
-                        list(Fill.from(100.25, 100)),
-                        OrderBook.BookQuote.from(0, Double.NaN));
+    public void testMatchingOnPrice() {
+        // Exact price
+        testPermutation(BUY,
+                        list(limit(BUY, 100, 100.25)),
+                        limit(SELL, 100, 100.25),
+                        list(fill(100, 100.25)),
+                        quote(0, Double.NaN));
 
         // Incoming order price is more aggressive
-        testPermutation(Side.BUY,
-                list(limit(Side.BUY, 100, 100.25)),
-                limit(Side.SELL, 100, 100.10),
-                list(Fill.from(100.25, 100)),
-                OrderBook.BookQuote.from(0, Double.NaN));
+        testPermutation(BUY,
+                list(limit(BUY, 100, 100.25)),
+                limit(SELL, 100, 100.10),
+                list(fill(100, 100.25)),
+                quote(0, Double.NaN));
 
         // Incoming order price is more passive
-        testPermutation(Side.BUY,
-                list(limit(Side.BUY, 100, 100.25)),
-                limit(Side.SELL, 100, 100.50),
+        testPermutation(BUY,
+                list(limit(BUY, 100, 100.25)),
+                limit(SELL, 100, 100.50),
                 list(),
-                OrderBook.BookQuote.from(100, 100.25));
+                quote(100,100.25));
 
     }
+    public void testMatchingOnQty() {
 
-    private static void testPermutation(Side side, List<Order> restingOrders, Order incomingOrder, List<Fill> expectedFills, OrderBook.BookQuote expectedQuote) {
+    }
+    private Fill fill(long qty, double price) {
+        return Fill.from(price, qty);
+    }
+    private static void testPermutation(Side side, List<Order> restingOrders, Order incomingOrder, List<Fill> expectedFills, Quote expectedQuote) {
         OrderBook orderBook = new OrderBook(side);
         for (Order order : restingOrders) {
             orderBook.post(order);
@@ -140,7 +149,8 @@ public class OrderBookTest extends TestCase {
     public static Order market(Side side,  long qty) {
         return new Order(side, OrderType.MARKET, qty, Double.NaN);
     }
-    public static OrderBook.BookQuote sidedQuote(double price, long qty) {
-        return new OrderBook.BookQuote(Price.of(price), qty);
+
+    public static Quote quote(long qty, double price) {
+        return new Quote(Price.of(price), qty);
     }
 }

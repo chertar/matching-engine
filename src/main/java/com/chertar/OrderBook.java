@@ -85,58 +85,12 @@ public class OrderBook {
         }
         throw new MatchingEngineException("There should have been at least one fill");
     }
-    public BookQuote topQuote() {
+    public Quote topQuote() {
         if (priceLevelsSorted.isEmpty()){
-            return BookQuote.nullQuote();
+            return Quote.nullQuote();
         }
         PriceLevel level = this.priceLevelsSorted.first();
-        BookQuote quote = new BookQuote(level.price(), level.qty());
+        Quote quote = new Quote(level.price(), level.qty());
         return quote;
     }
-
-    public static class BookQuote {
-        private final Price price;
-        private final long qty;
-        private static final BookQuote nullQuote = from(0, Double.NaN);
-
-        public static BookQuote from(long qty, double price) {
-            return new BookQuote(Price.of(price), qty);
-        }
-
-        public static BookQuote nullQuote() {
-            return nullQuote;
-        }
-
-        public BookQuote(Price price, long qty) {
-            this.price = price;
-            this.qty = qty;
-        }
-        public Price price() {
-            return this.price;
-        }
-        public long qty() {
-            return this.qty;
-        }
-        @Override
-        public boolean equals(Object o) {
-            if (!(o instanceof BookQuote)) {
-                return false;
-            }
-            BookQuote other = (BookQuote) o;
-            return other.price.equals(price) && other.qty == qty;
-        }
-        @Override
-        public int hashCode() {
-            return price.hashCode();
-        }
-
-        @Override
-        public String toString() {
-            return "SidedQuote{" +
-                    "price=" + price +
-                    ", qty=" + qty +
-                    '}';
-        }
-    }
-
 }
