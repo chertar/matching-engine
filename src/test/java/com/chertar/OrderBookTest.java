@@ -105,6 +105,10 @@ public class OrderBookTest extends TestCase {
     }
 
     public void testMatchingOnPrice() {
+        /***************************************
+         * INCOMING SELL VS. RESTING BUY
+         ***************************************/
+
         // Exact price
         testPermutation(BUY,
                         list(limit(BUY, 100, 100.25)),
@@ -126,10 +130,34 @@ public class OrderBookTest extends TestCase {
                 list(),
                 quote(100,100.25));
 
-    }
-    public void testMatchingOnQty() {
+        /***************************************
+         * INCOMING BUY VS. RESTING SELL
+         ***************************************/
+
+        // Exact price
+        testPermutation(SELL,
+                list(limit(SELL, 100, 100.25)),
+                limit(BUY, 100, 100.25),
+                list(fill(100, 100.25)),
+                quote(0, Double.NaN));
+
+        // Incoming order price is more aggressive
+        testPermutation(SELL,
+                list(limit(SELL, 100, 100.25)),
+                limit(BUY, 100, 100.50),
+                list(fill(100, 100.25)),
+                quote(0, Double.NaN));
+
+        // Incoming order price is more passive
+        testPermutation(SELL,
+                list(limit(SELL, 100, 100.25)),
+                limit(BUY, 100, 100.10),
+                list(),
+                quote(100,100.25));
+
 
     }
+
     private Fill fill(long qty, double price) {
         return Fill.from(price, qty);
     }

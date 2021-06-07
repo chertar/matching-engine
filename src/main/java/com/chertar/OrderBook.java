@@ -71,7 +71,7 @@ public class OrderBook {
         List<Fill> fills = new ArrayList<>();
         while (level.peek() != null) {
             Order restingOrder = level.peek();
-            long fillQty = Math.min(order.qty(), restingOrder.qty());
+            long fillQty = Math.min(order.leavesQty(), restingOrder.leavesQty());
             final Fill fill = Fill.of(price, fillQty);
             fills.add(fill);
             restingOrder.processFill(fill);
