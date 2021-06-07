@@ -17,7 +17,7 @@ public class MatchingEngine {
         OrderBook oppositeOrderBook = order.side().isBuy() ? asks : bids;
         OrderBook sameSideOrderBook = order.side().isBuy() ? bids : asks;
         List<Fill> fills = oppositeOrderBook.match(order);
-        if (!order.isFullyFilled()){
+        if (!order.isFullyFilled() && order.type() == OrderType.LIMIT){
             sameSideOrderBook.post(order);
         }
         return fills;
