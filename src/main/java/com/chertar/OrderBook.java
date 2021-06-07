@@ -80,10 +80,10 @@ public class OrderBook {
             }
             order.processFill(fill);
             if (order.isFullyFilled()) {
-                return fills;
+                break;
             }
         }
-        throw new MatchingEngineException("There should have been at least one fill");
+        return fills;
     }
     public Quote topQuote() {
         if (priceLevelsSorted.isEmpty()){

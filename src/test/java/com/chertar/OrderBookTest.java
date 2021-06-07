@@ -3,6 +3,7 @@ package com.chertar;
 import static com.chertar.Side.*;
 
 import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.util.List;
 
@@ -154,8 +155,45 @@ public class OrderBookTest extends TestCase {
                 limit(BUY, 100, 100.10),
                 list(),
                 quote(100,100.25));
+    }
 
+    @Test
+    public void testMatchingOnQty() {
+        // order qty < resting qty
+        testPermutation(BUY,
+                list(limit(BUY, 100, 100.25)),
+                limit(SELL, 30, 100.25),
+                list(fill(30, 100.25)),
+                quote(70, 100.25));
 
+        // order qty > resting qty
+        testPermutation(BUY,
+                list(limit(BUY, 100, 100.25)),
+                limit(SELL, 150, 100.25),
+                list(fill(100, 100.25)),
+                quote(0, Double.NaN));
+    }
+
+    @Test
+    public void testMatchingMultipleFills() {
+        testPermutation(BUY,
+                list(limit(BUY, 10, 100.25),
+                     limit(BUY, 100, 100.25)),
+                limit(SELL, 30, 100.25),
+                list(fill(10, 100.25),
+                     fill(20, 100.25)),
+                quote(80, 100.25));
+    }
+
+    @Test
+    public void testMatchingMultiplePriceLevels() {
+        testPermutation(BUY,
+                list(limit(BUY, 10, 100.50),
+                     limit(BUY, 100, 100.25)),
+                limit(SELL, 30, 100.25),
+                list(fill(10, 100.50),
+                     fill(20, 100.25)),
+                quote(80, 100.25));
     }
 
     private Fill fill(long qty, double price) {
@@ -167,7 +205,7 @@ public class OrderBookTest extends TestCase {
             orderBook.post(order);
         }
         List<Fill> fills = orderBook.match(incomingOrder);
-        assertThat(fills).containsExactlyElementsOf(expectedFills);
+        assertThat(fills).containsExactlyInAnyOrderElementsOf(expectedFills);
         assertThat(orderBook.topQuote()).isEqualTo(expectedQuote);
     }
 

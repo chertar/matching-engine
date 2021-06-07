@@ -57,4 +57,15 @@ public class Order {
     public Price avgPrice() {
         return avgPrice;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "side=" + side +
+                ", type=" + type +
+                ", limitPrice=" + limitPrice +
+                ", qty=" + qty +
+                ", filledQty=" + filledQty +
+                '}';
+    }
 }
