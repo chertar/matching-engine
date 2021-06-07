@@ -6,8 +6,8 @@ import java.util.*;
 public class MatchingEngine {
     private final Instrument instrument;
 
-    private BookSide bids = new BookSide(Side.BUY);
-    private BookSide asks = new BookSide(Side.SELL);
+    private OrderBook bids = new OrderBook(Side.BUY);
+    private OrderBook asks = new OrderBook(Side.SELL);
 
     public MatchingEngine(Instrument instrument) {
         Objects.requireNonNull(instrument);
@@ -15,9 +15,9 @@ public class MatchingEngine {
     }
 
     public List<Fill> incomingOrder(Order order) {
-        BookSide oppositeBookSide = order.side().isBuy() ? asks : bids;
-        BookSide sameBookSide = order.side().isBuy() ? bids : asks;
-        List<Fill> fills = oppositeBookSide.attemptToFill(order);
+        OrderBook oppositeOrderBook = order.side().isBuy() ? asks : bids;
+        OrderBook sameBookSide = order.side().isBuy() ? bids : asks;
+        List<Fill> fills = oppositeOrderBook.attemptToFill(order);
         if (order.isFullyFilled()){
             sameBookSide.postOrder(order);
         }

@@ -2,7 +2,7 @@ package com.chertar;
 
 import java.util.*;
 
-public class BookSide {
+public class OrderBook {
     private final Side side;
     private Comparator<Price> priceComparator;
 
@@ -14,7 +14,7 @@ public class BookSide {
     // We use a hashmap when posting an order so that it can be done in O(1)
     private final Map<Price, PriceLevel> priceLevelsMapped = new HashMap<>();
 
-    public BookSide(Side side) {
+    public OrderBook(Side side) {
         this.side = side;
         this.priceComparator = side.isBuy() ? PriceComparator.descending() : PriceComparator.ascending();
         Comparator<PriceLevel> levelComparator = new LevelComparator(priceComparator);
@@ -82,29 +82,29 @@ public class BookSide {
         }
         throw new MatchingEngineException("There should have been at least one fill");
     }
-    public SidedQuote bestBidOffer() {
+    public BookQuote bestBidOffer() {
         if (priceLevelsSorted.isEmpty()){
-            return SidedQuote.nullQuote();
+            return BookQuote.nullQuote();
         }
         PriceLevel level = this.priceLevelsSorted.first();
-        SidedQuote quote = new SidedQuote(level.price(), level.qty());
+        BookQuote quote = new BookQuote(level.price(), level.qty());
         return quote;
     }
 
-    public static class SidedQuote {
+    public static class BookQuote {
         private final Price price;
         private final long qty;
-        private static final SidedQuote nullQuote = from(0, Double.NaN);
+        private static final BookQuote nullQuote = from(0, Double.NaN);
 
-        public static SidedQuote from(long qty, double price) {
-            return new SidedQuote(Price.of(price), qty);
+        public static BookQuote from(long qty, double price) {
+            return new BookQuote(Price.of(price), qty);
         }
 
-        public static SidedQuote nullQuote() {
+        public static BookQuote nullQuote() {
             return nullQuote;
         }
 
-        public SidedQuote(Price price, long qty) {
+        public BookQuote(Price price, long qty) {
             this.price = price;
             this.qty = qty;
         }
@@ -116,10 +116,10 @@ public class BookSide {
         }
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof SidedQuote)) {
+            if (!(o instanceof BookQuote)) {
                 return false;
             }
-            SidedQuote other = (SidedQuote) o;
+            BookQuote other = (BookQuote) o;
             return other.price.equals(price) && other.qty == qty;
         }
         @Override

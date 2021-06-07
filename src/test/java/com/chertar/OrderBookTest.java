@@ -1,10 +1,7 @@
 package com.chertar;
 
 import junit.framework.TestCase;
-import org.assertj.core.util.Lists;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.util.Lists.list;
 
 
-public class BookSideTest extends TestCase {
+public class OrderBookTest extends TestCase {
 
     public void testPostingBuyOrders() {
         testPermutation(Side.BUY, list(), sidedQuote(Double.NaN, 0));
@@ -70,36 +67,36 @@ public class BookSideTest extends TestCase {
         // Try posting a sell order into a buy BookSide
         {
             Order order = limit(Side.SELL, 10, 100.25);
-            BookSide bookSide = new BookSide(Side.BUY);
+            OrderBook orderBook = new OrderBook(Side.BUY);
             assertThatExceptionOfType(MatchingEngineException.class)
-                    .isThrownBy(() -> bookSide.postOrder(order))
+                    .isThrownBy(() -> orderBook.postOrder(order))
                     .withMessageContaining("Order and book sides don't match");
         }
 
         //Try posting a buy order into a sell BookSide
         {
             Order order = limit(Side.BUY, 10, 100.25);
-            BookSide bookSide = new BookSide(Side.SELL);
+            OrderBook orderBook = new OrderBook(Side.SELL);
             assertThatExceptionOfType(MatchingEngineException.class)
-                    .isThrownBy(() -> bookSide.postOrder(order))
+                    .isThrownBy(() -> orderBook.postOrder(order))
                     .withMessageContaining("Order and book sides don't match");
         }
         //Try posting a market order
         {
             Order order = market(Side.BUY, 10);
-            BookSide bookSide = new BookSide(Side.BUY);
+            OrderBook orderBook = new OrderBook(Side.BUY);
             assertThatExceptionOfType(MatchingEngineException.class)
-                    .isThrownBy(() -> bookSide.postOrder(order))
+                    .isThrownBy(() -> orderBook.postOrder(order))
                     .withMessageContaining("Market orders cannot be posted");
         }
     }
 
-    private static void testPermutation(Side side, List<Order> orders, BookSide.SidedQuote expectedQuote) {
-        BookSide bookSide = new BookSide(side);
+    private static void testPermutation(Side side, List<Order> orders, OrderBook.BookQuote expectedQuote) {
+        OrderBook orderBook = new OrderBook(side);
         for (Order order : orders) {
-            bookSide.postOrder(order);
+            orderBook.postOrder(order);
         }
-        BookSide.SidedQuote quote = bookSide.bestBidOffer();
+        OrderBook.BookQuote quote = orderBook.bestBidOffer();
         assertThat(quote).isEqualTo(expectedQuote);
     }
 
@@ -109,32 +106,32 @@ public class BookSideTest extends TestCase {
                         list(limit(Side.BUY, 100, 100.25)),
                         limit(Side.SELL, 100, 100.25),
                         list(Fill.from(100.25, 100)),
-                        BookSide.SidedQuote.from(0, Double.NaN));
+                        OrderBook.BookQuote.from(0, Double.NaN));
 
         // Incoming order price is more aggressive
         testPermutation(Side.BUY,
                 list(limit(Side.BUY, 100, 100.25)),
                 limit(Side.SELL, 100, 100.10),
                 list(Fill.from(100.25, 100)),
-                BookSide.SidedQuote.from(0, Double.NaN));
+                OrderBook.BookQuote.from(0, Double.NaN));
 
         // Incoming order price is more passive
         testPermutation(Side.BUY,
                 list(limit(Side.BUY, 100, 100.25)),
                 limit(Side.SELL, 100, 100.50),
                 list(),
-                BookSide.SidedQuote.from(100, 100.25));
+                OrderBook.BookQuote.from(100, 100.25));
 
     }
 
-    private static void testPermutation(Side side, List<Order> restingOrders, Order incomingOrder, List<Fill> expectedFills, BookSide.SidedQuote expectedQuote) {
-        BookSide bookSide = new BookSide(side);
+    private static void testPermutation(Side side, List<Order> restingOrders, Order incomingOrder, List<Fill> expectedFills, OrderBook.BookQuote expectedQuote) {
+        OrderBook orderBook = new OrderBook(side);
         for (Order order : restingOrders) {
-            bookSide.postOrder(order);
+            orderBook.postOrder(order);
         }
-        List<Fill> fills = bookSide.attemptToFill(incomingOrder);
+        List<Fill> fills = orderBook.attemptToFill(incomingOrder);
         assertThat(fills).containsExactlyElementsOf(expectedFills);
-        assertThat(bookSide.bestBidOffer()).isEqualTo(expectedQuote);
+        assertThat(orderBook.bestBidOffer()).isEqualTo(expectedQuote);
     }
 
     public static Order limit(Side side,  long qty, double price) {
@@ -143,7 +140,7 @@ public class BookSideTest extends TestCase {
     public static Order market(Side side,  long qty) {
         return new Order(side, OrderType.MARKET, qty, Double.NaN);
     }
-    public static BookSide.SidedQuote sidedQuote(double price, long qty) {
-        return new BookSide.SidedQuote(Price.of(price), qty);
+    public static OrderBook.BookQuote sidedQuote(double price, long qty) {
+        return new OrderBook.BookQuote(Price.of(price), qty);
     }
 }
