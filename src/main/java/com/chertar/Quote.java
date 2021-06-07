@@ -42,7 +42,7 @@ public class Quote {
 
     @Override
     public String toString() {
-        return "SidedQuote{" +
+        return "Quote{" +
                 "price=" + price +
                 ", qty=" + qty +
                 '}';

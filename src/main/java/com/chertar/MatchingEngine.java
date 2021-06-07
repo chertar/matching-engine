@@ -1,6 +1,5 @@
 package com.chertar;
 
-import javax.sound.midi.Instrument;
 import java.util.*;
 
 public class MatchingEngine {
@@ -22,5 +21,11 @@ public class MatchingEngine {
             sameSideOrderBook.post(order);
         }
         return fills;
+    }
+    public Quote topBids() {
+        return this.bids.topQuote();
+    }
+    public Quote topAsks() {
+        return this.asks.topQuote();
     }
 }

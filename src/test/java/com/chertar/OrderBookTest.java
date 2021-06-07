@@ -158,6 +158,15 @@ public class OrderBookTest extends TestCase {
     }
 
     @Test
+    public void testMarketOrder() {
+        testPermutation(SELL,
+                list(limit(SELL, 100, 100.25)),
+                market(BUY, 100),
+                list(fill(100, 100.25)),
+                quote(0, Double.NaN));
+    }
+
+    @Test
     public void testMatchingOnQty() {
         // order qty < resting qty
         testPermutation(BUY,
