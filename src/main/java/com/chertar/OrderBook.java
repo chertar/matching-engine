@@ -21,13 +21,17 @@ public class OrderBook {
          this.priceLevelsSorted= new TreeSet<PriceLevel>(levelComparator);
     }
 
-    public void postOrder(Order order) {
+    public void post(Order order) {
         if (order.side() != this.side) {
             throw new MatchingEngineException("Order and book sides don't match");
         }
         if (order.type() == OrderType.MARKET) {
             throw new MatchingEngineException("Market orders cannot be posted");
         }
+        if (order.leavesQty() <=0 ) {
+            throw new MatchingEngineException("Cannot post fully traded order");
+        }
+
         Price price = order.limitPrice();
         PriceLevel level = priceLevelsMapped.get(price);
         if (level == null) {
@@ -38,12 +42,11 @@ public class OrderBook {
         level.postOrder(order);
     }
 
-    public List<Fill> attemptToFill(Order order) {
+    public List<Fill> match(Order order) {
         Objects.requireNonNull(order);
         if (order.side().isBuy() == side.isBuy()) {
             throw new MatchingEngineException("Order and book sides do not match. orderSide=" + order.side() + " bookSide=" + this.side);
         }
-        // Try to match the order
         Iterator<PriceLevel> iterator = priceLevelsSorted.iterator();
         List<Fill> fills = new ArrayList<>();
         while (iterator.hasNext()) {
@@ -82,7 +85,7 @@ public class OrderBook {
         }
         throw new MatchingEngineException("There should have been at least one fill");
     }
-    public BookQuote bestBidOffer() {
+    public BookQuote topQuote() {
         if (priceLevelsSorted.isEmpty()){
             return BookQuote.nullQuote();
         }

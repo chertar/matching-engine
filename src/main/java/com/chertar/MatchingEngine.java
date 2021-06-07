@@ -16,10 +16,10 @@ public class MatchingEngine {
 
     public List<Fill> incomingOrder(Order order) {
         OrderBook oppositeOrderBook = order.side().isBuy() ? asks : bids;
-        OrderBook sameBookSide = order.side().isBuy() ? bids : asks;
-        List<Fill> fills = oppositeOrderBook.attemptToFill(order);
-        if (order.isFullyFilled()){
-            sameBookSide.postOrder(order);
+        OrderBook sameSideOrderBook = order.side().isBuy() ? bids : asks;
+        List<Fill> fills = oppositeOrderBook.match(order);
+        if (!order.isFullyFilled()){
+            sameSideOrderBook.post(order);
         }
         return fills;
     }

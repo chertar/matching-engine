@@ -69,7 +69,7 @@ public class OrderBookTest extends TestCase {
             Order order = limit(Side.SELL, 10, 100.25);
             OrderBook orderBook = new OrderBook(Side.BUY);
             assertThatExceptionOfType(MatchingEngineException.class)
-                    .isThrownBy(() -> orderBook.postOrder(order))
+                    .isThrownBy(() -> orderBook.post(order))
                     .withMessageContaining("Order and book sides don't match");
         }
 
@@ -78,7 +78,7 @@ public class OrderBookTest extends TestCase {
             Order order = limit(Side.BUY, 10, 100.25);
             OrderBook orderBook = new OrderBook(Side.SELL);
             assertThatExceptionOfType(MatchingEngineException.class)
-                    .isThrownBy(() -> orderBook.postOrder(order))
+                    .isThrownBy(() -> orderBook.post(order))
                     .withMessageContaining("Order and book sides don't match");
         }
         //Try posting a market order
@@ -86,7 +86,7 @@ public class OrderBookTest extends TestCase {
             Order order = market(Side.BUY, 10);
             OrderBook orderBook = new OrderBook(Side.BUY);
             assertThatExceptionOfType(MatchingEngineException.class)
-                    .isThrownBy(() -> orderBook.postOrder(order))
+                    .isThrownBy(() -> orderBook.post(order))
                     .withMessageContaining("Market orders cannot be posted");
         }
     }
@@ -94,9 +94,9 @@ public class OrderBookTest extends TestCase {
     private static void testPermutation(Side side, List<Order> orders, OrderBook.BookQuote expectedQuote) {
         OrderBook orderBook = new OrderBook(side);
         for (Order order : orders) {
-            orderBook.postOrder(order);
+            orderBook.post(order);
         }
-        OrderBook.BookQuote quote = orderBook.bestBidOffer();
+        OrderBook.BookQuote quote = orderBook.topQuote();
         assertThat(quote).isEqualTo(expectedQuote);
     }
 
@@ -127,11 +127,11 @@ public class OrderBookTest extends TestCase {
     private static void testPermutation(Side side, List<Order> restingOrders, Order incomingOrder, List<Fill> expectedFills, OrderBook.BookQuote expectedQuote) {
         OrderBook orderBook = new OrderBook(side);
         for (Order order : restingOrders) {
-            orderBook.postOrder(order);
+            orderBook.post(order);
         }
-        List<Fill> fills = orderBook.attemptToFill(incomingOrder);
+        List<Fill> fills = orderBook.match(incomingOrder);
         assertThat(fills).containsExactlyElementsOf(expectedFills);
-        assertThat(orderBook.bestBidOffer()).isEqualTo(expectedQuote);
+        assertThat(orderBook.topQuote()).isEqualTo(expectedQuote);
     }
 
     public static Order limit(Side side,  long qty, double price) {
