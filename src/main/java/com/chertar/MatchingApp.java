@@ -60,7 +60,7 @@ public class MatchingApp {
     }
 
     private void printQuotes() {
-        System.out.printf("%10s: %10s %10s %10s. %10s\n",
+        System.out.printf("%10s: %10s %10s %10s %10s\n",
                 "Instrument", "bidQty", "bidPrice","askQty","askPrice");
         for (Instrument instrument : instruments) {
             MatchingEngine engine = engineMap.get(instrument);
