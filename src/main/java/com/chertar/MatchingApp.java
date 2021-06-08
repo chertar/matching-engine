@@ -1,11 +1,9 @@
 package com.chertar;
 
 import com.chertar.util.Instrument;
-import com.chertar.util.OrderParsingException;
 import com.chertar.util.OrderType;
 import com.chertar.util.Side;
 
-import java.text.ParseException;
 import java.util.*;
 
 public class MatchingApp {
@@ -23,11 +21,12 @@ public class MatchingApp {
         engineMap = new HashMap<>();
         for (Instrument instrument : instruments) {
             engineMap.put(instrument, new MatchingEngine(instrument));
-            System.out.println("Created matching engine for " + instrument);
+            System.out.println("Created matching engine for " + instrument.symbol());
         }
     }
 
     public void start() {
+        printExamples();
         prompt();
 
         Scanner in = new Scanner(System.in);
@@ -36,11 +35,35 @@ public class MatchingApp {
             try {
                 Order order = parseOrder(line);
                 MatchingEngine engine = engineMap.get(order.instrument());
+                List<Fill> fills = engine.process(order);
+                if (fills.isEmpty()) {
+                    System.out.println("No fills");
+                }
+                else {
+                    System.out.println("You got fills!");
+                    for (Fill fill : fills) {
+                        System.out.printf("%10d %10.2f\n", fill.qty(), fill.price().doubleValue());
+                    }
+                }
+                printQuotes();
             }
             catch (IllegalArgumentException e) {
                 error(e.getMessage());
+                printExamples();
             }
             prompt();
+        }
+    }
+
+    private void printQuotes() {
+        System.out.printf("%10s: %10s %10s %10s. %10s\n",
+                "Instrument", "bidQty", "bidPrice","askQty","askPrice");
+        for (Instrument instrument : instruments) {
+            MatchingEngine engine = engineMap.get(instrument);
+            Quote topBids = engine.topBids();
+            Quote topAsks = engine.topAsks();
+            System.out.printf("%10s: %10d %10.2f %10d %10.02f\n",
+                    instrument.symbol(), topBids.qty(), topBids.price().doubleValue(), topAsks.qty(), topAsks.price().doubleValue());
         }
     }
 
@@ -58,11 +81,9 @@ public class MatchingApp {
         Instrument instrument = Instrument.of(parts[3].toUpperCase());
 
         MatchingEngine engine = engineMap.get(instrument);
-
         if (engine == null) {
-            throw new IllegalArgumentException("No matching engine exists for instrument '"+  instrument + "'");
+            throw new IllegalArgumentException("No matching engine configured for instrument '"+instrument.symbol()+"'");
         }
-
         double price;
 
         if (type == OrderType.LIMIT) {
@@ -77,10 +98,13 @@ public class MatchingApp {
     }
 
     private static void prompt() {
+        System.out.print("Enter order> ");
+    }
+
+    private static void printExamples() {
         System.out.print("Enter an order in one of these two formats:\n");
-        System.out.print("\t - limit buy/sell qty instrument price. Example: limit buy 10 BTC-USD 100.0\n");
-        System.out.print("\t - market buy/sell qty instrument. Example: market sell 10 BTC-USD\n");
-        System.out.print("> ");
+        System.out.print("\t - LIMIT BUY/SELL qty instrument price. Example: LIMIT BUY 10 BTC-USD 100.0\n");
+        System.out.print("\t - MARKET BUYS/SELL qty instrument. Example: MARKET SELL 10 BTC-USD\n");
     }
 
     private static void error(String msg) {

@@ -34,4 +34,8 @@ public class Instrument {
                 "symbol='" + symbol + '\'' +
                 '}';
     }
+
+    public String symbol() {
+        return symbol;
+    }
 }
