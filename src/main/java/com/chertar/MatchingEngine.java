@@ -36,7 +36,7 @@ public class MatchingEngine {
     }
 
     public List<Fill> process(Order order) {
-        if (order.instrument().equals(this.instrument)) {
+        if (!order.instrument().equals(this.instrument)) {
             throw new MatchingEngineException("Instrument does not match");
         }
 
