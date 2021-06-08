@@ -6,22 +6,21 @@ import com.chertar.util.OrderType;
 import com.chertar.util.Side;
 
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class MatchingApp {
-    private List<Instrument> instruments = List.of(
-            Instrument.of("BTC-USD"),
-            Instrument.of("ETH-USD"),
-            Instrument.of("ETH-BTC"));
-
-    private Map<Instrument, MatchingEngine> engineMap = new HashMap<>();
+    private final List<Instrument> instruments;
+    private final Map<Instrument, MatchingEngine> engineMap;
 
     public MatchingApp () {
         System.out.println("Starting Matching App");
 
+        instruments = new ArrayList<>();
+        instruments.add(Instrument.of("BTC-USD"));
+        instruments.add(Instrument.of("ETH-USD"));
+        instruments.add(Instrument.of("ETH-BTC"));
+
+        engineMap = new HashMap<>();
         for (Instrument instrument : instruments) {
             engineMap.put(instrument, new MatchingEngine(instrument));
             System.out.println("Created matching engine for " + instrument);

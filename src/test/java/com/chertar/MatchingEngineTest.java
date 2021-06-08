@@ -15,7 +15,8 @@ import static org.assertj.core.util.Lists.list;
 
 
 public class MatchingEngineTest extends TestCase {
-    private MatchingEngine engine = new MatchingEngine(Instrument.of("BTC-USD"));
+    private Instrument instrument = Instrument.of("BTC-USD");
+    private MatchingEngine engine = new MatchingEngine(instrument);
 
     public void testBuyLimitOrders() {
         buildOrderBook();
@@ -218,7 +219,7 @@ public class MatchingEngineTest extends TestCase {
     }
 
     public static Order market(Side side, long qty) {
-        return new Order(side, OrderType.MARKET, qty, Double.NaN);
+        return new Order(Instrument.of("BTC-USD"),side, OrderType.MARKET, qty, Double.NaN);
     }
 
     public static Quote quote(long qty, double price) {
@@ -233,7 +234,7 @@ public class MatchingEngineTest extends TestCase {
     }
 
     private void submitOrderAndVerifyFills(Side side, OrderType type, long qty, double price, List<Fill> expectedFills) {
-        List<Fill> fills = engine.process(new Order(side, type, qty, price));
+        List<Fill> fills = engine.process(new Order(instrument, side, type, qty, price));
         assertThat(fills).containsExactlyElementsOf(expectedFills);
     }
 

@@ -1,6 +1,7 @@
 package com.chertar;
 
 import com.chertar.util.Instrument;
+import com.chertar.util.MatchingEngineException;
 import com.chertar.util.OrderType;
 import com.chertar.util.Side;
 
@@ -35,6 +36,10 @@ public class MatchingEngine {
     }
 
     public List<Fill> process(Order order) {
+        if (order.instrument().equals(this.instrument)) {
+            throw new MatchingEngineException("Instrument does not match");
+        }
+
         OrderBook oppositeOrderBook = order.side().isBuy() ? asks : bids;
         OrderBook sameSideOrderBook = order.side().isBuy() ? bids : asks;
         List<Fill> fills = oppositeOrderBook.match(order);
