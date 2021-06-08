@@ -74,7 +74,7 @@ public class MatchingApp {
             throw new IllegalArgumentException("Unsupported order type " + type);
         }
 
-        return new Order(side, type, qty, price);
+        return new Order(instrument, side, type, qty, price);
     }
 
     private static void prompt() {

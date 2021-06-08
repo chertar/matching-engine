@@ -33,6 +33,10 @@ public class Order {
         return this.qty;
     }
 
+    public Instrument instrument() {
+        return instrument;
+    }
+
     public void processFill(Fill fill) {
         if (fill.qty() > leavesQty()) {
             throw new MatchingEngineException("Order is overfilled");
