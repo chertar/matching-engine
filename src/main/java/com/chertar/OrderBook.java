@@ -5,21 +5,24 @@ import com.chertar.util.*;
 import java.util.*;
 
 /**
- * Represents one side of the Matching Engine, either bids or asks.  It maintains a collection Price Levels
+ * One side of the Matching Engine, either bids or asks.  It maintains a collection Price Levels
  * and contains logic for:
- * - matching an incoming opposite-side order against existing order
+ * - matching an incoming opposite-side order against existing orders
  * - posting a same-side order to the appropriate price leve
+ *
+ * We store price levels in two data structures at the same time in order to achieve better time-complexity.
+ * See in-line comments for more details.
  */
 public class OrderBook {
     private final Side side;
     private Comparator<Price> priceComparator;
 
-    // We use a sorted set when matching an order so that finding the first order takes O(1)
-    // Inserting or removing a new price level will take O(log(n)) that is an acceptable trade-off
-    // since we will be reading price levels much more frequently that we would be inserting and removing them
+    // Data structure 1: We use a sorted set when matching an order so that finding the first order takes O(1)
+    // Inserting or removing a new price level will take O(log(m)) where m is the number of price levels. It's
+    // an desirable trade-off since we will be reading price levels much more frequently that we will be inserting and removing them
     private final SortedSet<PriceLevel> priceLevelsSorted;
 
-    // We use a hashmap when posting an order so that it can be done in O(1)
+    // Data structure 2: We use a hashmap when posting an order so that it can be done in O(1)
     private final Map<Price, PriceLevel> priceLevelsMapped = new HashMap<>();
 
     public OrderBook(Side side) {
@@ -29,6 +32,11 @@ public class OrderBook {
          this.priceLevelsSorted= new TreeSet<PriceLevel>(levelComparator);
     }
 
+    /**
+     * Adds the passed order the the order book at the appropriate price level
+     * @param order
+     * @throws MatchingEngine if the order if of a different side, of order type market, or has been fully traded
+     */
     public void post(Order order) {
         if (order.side() != this.side) {
             throw new MatchingEngineException("Order and book sides don't match");
@@ -50,6 +58,12 @@ public class OrderBook {
         level.postOrder(order);
     }
 
+    /**
+     * Attempts to fill the passed order against prexisting orders
+     * @param order
+     * @return litst of fills if there was a match
+     * @throws MatchingEngine if the order is of the same side as the order book
+     */
     public List<Fill> match(Order order) {
         Objects.requireNonNull(order);
         if (order.side().isBuy() == side.isBuy()) {
@@ -93,6 +107,11 @@ public class OrderBook {
         }
         return fills;
     }
+
+    /**
+     * @return the quote of the top price level based on price aggressiveness.
+     * Bids return the lowest price level.  Asks return the highest.
+     */
     public Quote topQuote() {
         if (priceLevelsSorted.isEmpty()){
             return Quote.nullQuote();

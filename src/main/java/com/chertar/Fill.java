@@ -4,6 +4,9 @@ import com.chertar.util.Price;
 
 import java.util.Objects;
 
+/**
+ * Represents a fill that gets created whenever two orders match
+ */
 public class Fill {
     private final Price price;
     private final long qty;

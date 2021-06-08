@@ -3,8 +3,8 @@ package com.chertar;
 import com.chertar.util.Price;
 
 /**
- * Represents the top view of an order book, holding the best bid or ask
- * and total qty
+ * Represents the top view of an order book, holding the best bid or ask price
+ * and the sum of leaves qty for all orders at that price level.
  * */
 public class Quote {
     private final Price price;

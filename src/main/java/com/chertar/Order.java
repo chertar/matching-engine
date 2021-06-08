@@ -2,6 +2,10 @@ package com.chertar;
 
 import com.chertar.util.*;
 
+/**
+ * A simplified view of an order in the system.  Contains the ability to process fills
+ * and compute average price.
+ */
 public class Order {
     private final Instrument instrument;
     private final Side side;

@@ -97,15 +97,6 @@ public class OrderBookTest extends TestCase {
         }
     }
 
-    private static void testPermutation(Side side, List<Order> orders, Quote expectedQuote) {
-        OrderBook orderBook = new OrderBook(side);
-        for (Order order : orders) {
-            orderBook.post(order);
-        }
-        Quote quote = orderBook.topQuote();
-        assertThat(quote).isEqualTo(expectedQuote);
-    }
-
     public void testMatchingOnPrice() {
         /***************************************
          * INCOMING SELL VS. RESTING BUY
@@ -218,7 +209,14 @@ public class OrderBookTest extends TestCase {
         assertThat(fills).containsExactlyInAnyOrderElementsOf(expectedFills);
         assertThat(orderBook.topQuote()).isEqualTo(expectedQuote);
     }
-
+    private static void testPermutation(Side side, List<Order> orders, Quote expectedQuote) {
+        OrderBook orderBook = new OrderBook(side);
+        for (Order order : orders) {
+            orderBook.post(order);
+        }
+        Quote quote = orderBook.topQuote();
+        assertThat(quote).isEqualTo(expectedQuote);
+    }
     public static Order limit(Side side,  long qty, double price) {
         return new Order(instrument, side, OrderType.LIMIT, qty, price);
     }
