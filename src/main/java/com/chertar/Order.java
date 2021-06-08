@@ -1,11 +1,9 @@
 package com.chertar;
 
-import com.chertar.util.MatchingEngineException;
-import com.chertar.util.OrderType;
-import com.chertar.util.Price;
-import com.chertar.util.Side;
+import com.chertar.util.*;
 
 public class Order {
+    private final Instrument instrument;
     private final Side side;
     private final OrderType type;
     private final Price limitPrice;
@@ -14,7 +12,8 @@ public class Order {
     private Price avgPrice = Price.of(0.0);
     private long filledQty;
 
-    public Order(Side side, OrderType type,  long qty, double limitPrice) {
+    public Order(Instrument instrument, Side side, OrderType type,  long qty, double limitPrice) {
+        this.instrument = instrument;
         this.side = side;
         this.type = type;
         this.limitPrice = Price.of(limitPrice);
@@ -73,4 +72,5 @@ public class Order {
                 ", filledQty=" + filledQty +
                 '}';
     }
+
 }

@@ -12,20 +12,23 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class MatchingApp {
-    public static void main(String[] args) {
-        System.out.println("Starting Matching App");
-        List<Instrument> instruments = List.of(
-                Instrument.of("BTC-USD"),
-                Instrument.of("ETH-USD"),
-                Instrument.of("ETH-BTC"));
+    private List<Instrument> instruments = List.of(
+            Instrument.of("BTC-USD"),
+            Instrument.of("ETH-USD"),
+            Instrument.of("ETH-BTC"));
 
-        Map<Instrument, MatchingEngine> engineMap = new HashMap<>();
+    private Map<Instrument, MatchingEngine> engineMap = new HashMap<>();
+
+    public MatchingApp () {
+        System.out.println("Starting Matching App");
 
         for (Instrument instrument : instruments) {
             engineMap.put(instrument, new MatchingEngine(instrument));
             System.out.println("Created matching engine for " + instrument);
         }
+    }
 
+    public void start() {
         prompt();
 
         Scanner in = new Scanner(System.in);
@@ -33,6 +36,7 @@ public class MatchingApp {
             String line = in.nextLine();
             try {
                 Order order = parseOrder(line);
+                MatchingEngine engine = engineMap.get(order.instrument());
             }
             catch (IllegalArgumentException e) {
                 error(e.getMessage());
@@ -41,22 +45,36 @@ public class MatchingApp {
         }
     }
 
-
-
-
-    private static Order parseOrder(String line) throws IllegalArgumentException {
+    private Order parseOrder(String line) throws IllegalArgumentException {
         String[] parts = line.split(" ");
         OrderType type = OrderType.valueOf(parts[0].toUpperCase());
         if (type == OrderType.LIMIT && parts.length != 5) {
             throw new IllegalArgumentException("Limit order expects 5 arguments but received " + parts.length);
-        }
-        else if(type == OrderType.MARKET && parts.length != 4) {
+        } else if(type == OrderType.MARKET && parts.length != 4) {
             throw new IllegalArgumentException("Market order expects 4 arguments but received " + parts.length);
         }
+
         Side side = Side.valueOf(parts[1].toUpperCase());
         long qty = Long.valueOf(parts[2]);
+        Instrument instrument = Instrument.of(parts[3].toUpperCase());
 
-        return null;
+        MatchingEngine engine = engineMap.get(instrument);
+
+        if (engine == null) {
+            throw new IllegalArgumentException("No matching engine exists for instrument '"+  instrument + "'");
+        }
+
+        double price;
+
+        if (type == OrderType.LIMIT) {
+            price = Double.parseDouble(parts[4]);
+        } else if (type == OrderType.MARKET) {
+            price = Double.NaN;
+        } else {
+            throw new IllegalArgumentException("Unsupported order type " + type);
+        }
+
+        return new Order(side, type, qty, price);
     }
 
     private static void prompt() {
@@ -68,5 +86,9 @@ public class MatchingApp {
 
     private static void error(String msg) {
         System.out.println("Command line parsing error. Please check your arguments. " + msg);
+    }
+    public static void main(String[] args) {
+        MatchingApp app = new MatchingApp();
+        app.start();
     }
 }
