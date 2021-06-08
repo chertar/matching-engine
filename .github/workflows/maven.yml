@@ -28,8 +28,3 @@ jobs:
       with:
         name: matching-engine-1.0.jar
         path: target/matching-engine-1.0.jar
-    - name: Upload test results
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-results
-        path: target/surefire-reports/*.txt
