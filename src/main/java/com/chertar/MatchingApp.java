@@ -6,6 +6,10 @@ import com.chertar.util.Side;
 
 import java.util.*;
 
+/**
+ * A simple command-line based app that accepts orders
+ * and prints fills and top of book quotes
+ */
 public class MatchingApp {
     private final List<Instrument> instruments;
     private final Map<Instrument, MatchingEngine> engineMap;
