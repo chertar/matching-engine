@@ -25,6 +25,6 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Upload artifact
       uses: actions/upload-artifact@2
-        with:
-          name: matching-engine-1.0.jar
-          path: target/matching-engine-1.0.jar
+      with:
+        name: matching-engine-1.0.jar
+        path: target/matching-engine-1.0.jar
