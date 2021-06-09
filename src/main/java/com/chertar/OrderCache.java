@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * A cache which allows orders to be looked up by id in constant time
  */
-public class OrderLookup {
+public class OrderCache {
     private final Map<String, Order> orders = new HashMap<>();
 
     public Order get(String id) {

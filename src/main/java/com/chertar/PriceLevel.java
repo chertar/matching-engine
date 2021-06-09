@@ -44,6 +44,18 @@ public class PriceLevel {
         return orders.size();
     }
 
+    public void cancel(Order order) {
+        // This is an O(n) implementation where n is the nubmer of orders in the queue
+        // In a production implementation, I would add a hash map so order lookup can be
+        // done in O(1)
+
+        boolean found = orders.remove(order);
+
+        if (!found) {
+            throw new MatchingEngineException("No order found " + order);
+        }
+    }
+
     public long qty() {
         // This is a O(n) implementation where n is the number of orders in the queue
         // In a production implementation, I would implement it in O(1) by keeping

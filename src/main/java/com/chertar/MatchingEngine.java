@@ -29,6 +29,7 @@ public class MatchingEngine {
 
     private OrderBook bids = new OrderBook(Side.BUY);
     private OrderBook asks = new OrderBook(Side.SELL);
+    private OrderCache orderCache = new OrderCache();
 
     public MatchingEngine(Instrument instrument) {
         Objects.requireNonNull(instrument);
@@ -39,7 +40,7 @@ public class MatchingEngine {
         if (!order.instrument().equals(this.instrument)) {
             throw new MatchingEngineException("Instrument does not match");
         }
-
+        orderCache.add(order);
         OrderBook oppositeOrderBook = order.side().isBuy() ? asks : bids;
         OrderBook sameSideOrderBook = order.side().isBuy() ? bids : asks;
         List<Fill> fills = oppositeOrderBook.match(order);
@@ -53,5 +54,13 @@ public class MatchingEngine {
     }
     public Quote topAsks() {
         return this.asks.topQuote();
+    }
+    public void cancel(String orderId) {
+        Order order = orderCache.get(orderId);
+        if (order == null) {
+            throw new MatchingEngineException("No order found with id '"+orderId+"'");
+        }
+        OrderBook book = order.side().isBuy() ? bids : asks;
+        book.cancel(order);
     }
 }

@@ -78,7 +78,8 @@ public class Order {
     @Override
     public String toString() {
         return "Order{" +
-                "side=" + side +
+                "id=" + id +
+                " side=" + side +
                 ", type=" + type +
                 ", limitPrice=" + limitPrice +
                 ", qty=" + qty +
