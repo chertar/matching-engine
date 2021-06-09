@@ -15,6 +15,7 @@ public class MatchingApp {
     private final List<Instrument> instruments;
     private final Map<Instrument, MatchingEngine> engineMap;
     private OrderIdGenerator idGenerator = new OrderIdGenerator();
+    private OrderCache orderCache = new OrderCache();
 
     public MatchingApp () {
         System.out.println("Starting Matching App");
@@ -37,20 +38,39 @@ public class MatchingApp {
 
         Scanner in = new Scanner(System.in);
         while (in.hasNext()) {
-            String line = in.nextLine();
+            String line = in.nextLine().toUpperCase();
             try {
-                Order order = parseOrder(line);
-                MatchingEngine engine = engineMap.get(order.instrument());
-                List<Fill> fills = engine.process(order);
-                if (fills.isEmpty()) {
-                    System.out.println("No fills");
+                if (line.startsWith("CANCEL")) {
+                    String orderId = parseOrderId(line);
+                    Order order = orderCache.get(orderId);
+                    if (order == null) {
+                        throw new IllegalArgumentException("Cannot find order with id '"+orderId+"'");
+                    }
+                    MatchingEngine engine = engineMap.get(order.instrument());
+                    engine.cancel(order);
+                    System.out.println("Canceled order " + order);
                 }
-                else {
-                    System.out.println("You got fills!");
-                    for (Fill fill : fills) {
-                        System.out.printf("%10d %10.2f\n", fill.qty(), fill.price().doubleValue());
+                else if (line.startsWith("LIMIT") || line.startsWith("MARKET")) {
+                    Order order = parseOrder(line);
+                    orderCache.add(order);
+                    MatchingEngine engine = engineMap.get(order.instrument());
+                    List<Fill> fills = engine.process(order);
+                    System.out.print("Created order id=" + order.id());
+
+                    if (fills.isEmpty()) {
+                        System.out.println(". No fills");
+                    }
+                    else {
+                        System.out.println(". You got FILLS!");
+                        for (Fill fill : fills) {
+                            System.out.printf("%10d %10.2f\n", fill.qty(), fill.price().doubleValue());
+                        }
                     }
                 }
+                else {
+                    throw new IllegalArgumentException("Unreconized command. Command must be LIMIT, MARKET or CANCEL");
+                }
+
                 printQuotes();
             }
             catch (IllegalArgumentException e) {
@@ -102,18 +122,27 @@ public class MatchingApp {
         return new Order(idGenerator.next(), instrument, side, type, qty, price);
     }
 
+    private String parseOrderId(String line) {
+        String[] parts = line.split(" ");
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("Cannot parse order id.  Expected 1 argument but found " + (parts.length - 1));
+        }
+        return parts[1];
+    }
+
     private static void prompt() {
-        System.out.print("Enter order> ");
+        System.out.print("command> ");
     }
 
     private static void printExamples() {
-        System.out.print("Enter an order in one of these two formats:\n");
+        System.out.print("Enter a command:\n");
         System.out.print("\t - LIMIT BUY/SELL qty instrument price. Example: LIMIT BUY 10 BTC-USD 100.0\n");
         System.out.print("\t - MARKET BUYS/SELL qty instrument. Example: MARKET SELL 10 BTC-USD\n");
+        System.out.print("\t - CANCEL orderId.  Example CANCEL 3\n");
     }
 
     private static void error(String msg) {
-        System.out.println("Command line parsing error. Please check your arguments. " + msg);
+        System.out.println("ERROR: " + msg);
     }
     public static void main(String[] args) {
         MatchingApp app = new MatchingApp();

@@ -198,7 +198,7 @@ public class MatchingEngineTest extends TestCase {
          */
         assertQuote(35, 11.0, 40, 14.0);
 
-        engine.cancel(order.id());
+        engine.cancel(order);
         /** expected order book:
          bidQty     bidPrice    askQty      askPrice
          25         11.0        40          14.0
@@ -229,7 +229,7 @@ public class MatchingEngineTest extends TestCase {
          */
         assertQuote(25, 11.0, 50, 14.0);
 
-        engine.cancel(order.id());
+        engine.cancel(order);
         /** expected order book:
          bidQty     bidPrice    askQty      askPrice
          25         11.0        40          14.0

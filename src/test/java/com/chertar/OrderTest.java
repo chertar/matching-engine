@@ -9,7 +9,7 @@ public class OrderTest extends TestCase {
     private OrderIdGenerator idGenerator = new OrderIdGenerator();
     private Instrument instrument = Instrument.of("BTC-USD");
     public void testGetters() {
-        Order order = new Order(idGenerator.next(), instrument, Side.BUY, OrderType.LIMIT,  10, 100.01);
+        Order order = new Order("test-1", instrument, Side.BUY, OrderType.LIMIT,  10, 100.01);
         assertThat(order.id()).isEqualTo("test-1");
         assertThat(order.side()).isEqualTo(Side.BUY);
         assertThat(order.type()).isEqualTo(OrderType.LIMIT);
