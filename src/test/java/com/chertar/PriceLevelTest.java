@@ -52,4 +52,31 @@ public class PriceLevelTest extends TestCase {
                 .withMessageContaining("Market order cannot be posted");
     }
 
+    private Order order(long qty) {
+        return new Order(idGenerator.next(), instrument, Side.BUY, OrderType.LIMIT, qty, 100.25);
+    }
+
+    public void testCancelingOrder() {
+        // Post three orders and cancel the middle one
+        PriceLevel level = new PriceLevel(Price.of(100.25));
+
+        Order order1 = order(10);
+        Order order2 = order(20);
+        Order order3 = order(30);
+
+        level.postOrder(order1);
+        level.postOrder(order2);
+        level.postOrder(order3);
+
+        assertThat(level.qty()).isEqualTo(60);
+
+        level.cancel(order2);
+        assertThat(order2.cancelled()).isTrue();
+        assertThat(level.qty()).isEqualTo(40);
+
+        // Make sure order2 is not returned when polling the queue
+        assertThat(level.poll()).isEqualTo(order1);
+        assertThat(level.poll()).isEqualTo(order3);
+    }
+
 }
