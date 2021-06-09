@@ -1,2 +1,5 @@
-package com.chertar;public class OrderStatus {
+package com.chertar;
+
+public enum OrderStatus {
+    ACTIVE, FILLED, CANCELLED;
 }

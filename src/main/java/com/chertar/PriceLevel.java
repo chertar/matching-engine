@@ -48,7 +48,7 @@ public class PriceLevel {
         // This is an O(n) implementation where n is the nubmer of orders in the queue
         // In a production implementation, I would add a hash map so order lookup can be
         // done in O(1)
-
+        order.cancel();
         boolean found = orders.remove(order);
 
         if (!found) {

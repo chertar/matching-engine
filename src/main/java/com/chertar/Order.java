@@ -13,6 +13,10 @@ public class Order {
     private final OrderType type;
     private final Price limitPrice;
     private final long qty;
+    // Here I use a simple boolean to keep track of order state
+    // In a production implementation I would use an enum and
+    // support other states such as "filled", "rejected", etc.
+    private boolean canceled = false;
 
     private Price avgPrice = Price.of(0.0);
     private long filledQty;
@@ -41,9 +45,19 @@ public class Order {
     public long qty() {
         return this.qty;
     }
+    public boolean cancelled() {
+        return canceled;
+    }
 
     public Instrument instrument() {
         return instrument;
+    }
+
+    public void cancel() {
+        if (canceled) {
+            throw new MatchingEngineException("Order is already canceled");
+        }
+        this.canceled = true;
     }
 
     public void processFill(Fill fill) {
@@ -65,7 +79,7 @@ public class Order {
         return qty == filledQty;
     }
     public long leavesQty() {
-        return qty - filledQty;
+        return canceled ? 0 : qty - filledQty;
     }
     public long filledQty() {
         return filledQty;
@@ -84,6 +98,8 @@ public class Order {
                 ", limitPrice=" + limitPrice +
                 ", qty=" + qty +
                 ", filledQty=" + filledQty +
+                ", canceled=" + canceled +
+                ", leaves=" + leavesQty() +
                 '}';
     }
 
