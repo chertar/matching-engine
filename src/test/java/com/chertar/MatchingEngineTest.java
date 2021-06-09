@@ -177,6 +177,68 @@ public class MatchingEngineTest extends TestCase {
         assertQuote(0, Double.NaN, 40, 14.0);
     }
 
+    public void testCancelingBuyOrder() {
+        buildOrderBook();
+
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25         11.0        40          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(25, 11.0, 40, 14.0);
+
+        Order order = new Order(idGenerator.next(), instrument, BUY, OrderType.LIMIT, 10, 11.0);
+        engine.process(order);
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25, 10     11.0        40          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(35, 11.0, 40, 14.0);
+
+        engine.cancel(order.id());
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25         11.0        40          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(25, 11.0, 40, 14.0);
+    }
+
+    public void testCancelingSellOrder() {
+        buildOrderBook();
+
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25         11.0        40          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(25, 11.0, 40, 14.0);
+
+        Order order = new Order(idGenerator.next(), instrument, SELL, OrderType.LIMIT, 10, 14.0);
+        engine.process(order);
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25, 10     11.0        40, 10          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(25, 11.0, 50, 14.0);
+
+        engine.cancel(order.id());
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25         11.0        40          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(25, 11.0, 40, 14.0);
+    }
+
     /** creates order book:
      bidQty     bidPrice    askQty      askPrice
      25         11.0        40          14.0

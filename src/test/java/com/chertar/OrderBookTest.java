@@ -150,7 +150,6 @@ public class OrderBookTest extends TestCase {
                 quote(100,100.25));
     }
 
-    @Test
     public void testMarketOrder() {
         testPermutation(SELL,
                 list(limit(SELL, 100, 100.25)),
@@ -159,7 +158,6 @@ public class OrderBookTest extends TestCase {
                 quote(0, Double.NaN));
     }
 
-    @Test
     public void testMatchingOnQty() {
         // order qty < resting qty
         testPermutation(BUY,
@@ -176,7 +174,6 @@ public class OrderBookTest extends TestCase {
                 quote(0, Double.NaN));
     }
 
-    @Test
     public void testMatchingMultipleFills() {
         testPermutation(BUY,
                 list(limit(BUY, 10, 100.25),
@@ -187,7 +184,6 @@ public class OrderBookTest extends TestCase {
                 quote(80, 100.25));
     }
 
-    @Test
     public void testMatchingMultiplePriceLevels() {
         testPermutation(BUY,
                 list(limit(BUY, 10, 100.50),
@@ -196,6 +192,31 @@ public class OrderBookTest extends TestCase {
                 list(fill(10, 100.50),
                      fill(20, 100.25)),
                 quote(80, 100.25));
+    }
+
+    public void testCancelingOrders() {
+        OrderBook book = new OrderBook(BUY);
+        Order order1 = limit(BUY, 10, 101.0);
+        Order order2 = limit(BUY, 20, 100.0);
+        Order order3 = limit(BUY, 30, 99.0);
+
+        book.post(order1);
+        book.post(order2);
+        book.post(order3);
+
+        assertThat(book.topQuote()).isEqualTo(Quote.from(10, 101.0));
+
+        // Cancel the second order, top quote should not change
+        book.cancel(order2);
+        assertThat(book.topQuote()).isEqualTo(Quote.from(10, 101.0));
+
+        // Cancel the first order, top of book should match order3 since order2 is already gone
+        book.cancel(order1);
+        assertThat(book.topQuote()).isEqualTo(Quote.from(30, 99.0));
+
+        // Cancel the third order, order book shoudl become blank
+        book.cancel(order3);
+        assertThat(book.topQuote()).isEqualTo(Quote.nullQuote());
     }
 
     private Fill fill(long qty, double price) {

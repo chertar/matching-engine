@@ -120,7 +120,7 @@ public class OrderBook {
         Quote quote = new Quote(level.price(), level.qty());
         return quote;
     }
-    public void cancel(Order order) {
+    void cancel(Order order) {
         if (order.side() != this.side) {
             throw new MatchingEngineException("Cannot cancel an order iwth a different side");
         }
@@ -129,5 +129,9 @@ public class OrderBook {
         }
         PriceLevel level = this.priceLevelsMapped.get(order.limitPrice());
         level.cancel(order);
+        if (level.queueSize() == 0) {
+            this.priceLevelsMapped.remove(level.price());
+            this.priceLevelsSorted.remove(level);
+        }
     }
 }
