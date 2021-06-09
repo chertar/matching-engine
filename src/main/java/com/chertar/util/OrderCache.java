@@ -1,5 +1,6 @@
-package com.chertar;
+package com.chertar.util;
 
+import com.chertar.Order;
 import com.chertar.util.MatchingEngineException;
 
 import java.util.HashMap;
