@@ -1,6 +1,7 @@
 package com.chertar;
 
 import com.chertar.util.Instrument;
+import com.chertar.util.OrderIdGenerator;
 import com.chertar.util.OrderType;
 import com.chertar.util.Side;
 
@@ -13,6 +14,7 @@ import java.util.*;
 public class MatchingApp {
     private final List<Instrument> instruments;
     private final Map<Instrument, MatchingEngine> engineMap;
+    private OrderIdGenerator idGenerator = new OrderIdGenerator();
 
     public MatchingApp () {
         System.out.println("Starting Matching App");
@@ -97,8 +99,7 @@ public class MatchingApp {
         } else {
             throw new IllegalArgumentException("Unsupported order type " + type);
         }
-
-        return new Order(instrument, side, type, qty, price);
+        return new Order(idGenerator.next(), instrument, side, type, qty, price);
     }
 
     private static void prompt() {

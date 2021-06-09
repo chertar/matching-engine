@@ -15,6 +15,7 @@ import static org.assertj.core.util.Lists.list;
 
 public class OrderBookTest extends TestCase {
     private static Instrument instrument = Instrument.of("BTC-USD");
+    private static OrderIdGenerator idGenerator = new OrderIdGenerator();
     public void testPosting() {
         // BUYS
         testPermutation(BUY, list(), quote(0, Double.NaN));
@@ -218,10 +219,10 @@ public class OrderBookTest extends TestCase {
         assertThat(quote).isEqualTo(expectedQuote);
     }
     public static Order limit(Side side,  long qty, double price) {
-        return new Order(instrument, side, OrderType.LIMIT, qty, price);
+        return new Order(idGenerator.next(),instrument, side, OrderType.LIMIT, qty, price);
     }
     public static Order market(Side side,  long qty) {
-        return new Order(instrument, side, OrderType.MARKET, qty, Double.NaN);
+        return new Order(idGenerator.next(), instrument, side, OrderType.MARKET, qty, Double.NaN);
     }
 
     public static Quote quote(long qty, double price) {

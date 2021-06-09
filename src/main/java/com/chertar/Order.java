@@ -7,6 +7,7 @@ import com.chertar.util.*;
  * and compute average price.
  */
 public class Order {
+    private final String id;
     private final Instrument instrument;
     private final Side side;
     private final OrderType type;
@@ -16,7 +17,8 @@ public class Order {
     private Price avgPrice = Price.of(0.0);
     private long filledQty;
 
-    public Order(Instrument instrument, Side side, OrderType type,  long qty, double limitPrice) {
+    public Order(String id, Instrument instrument, Side side, OrderType type,  long qty, double limitPrice) {
+        this.id = id;
         this.instrument = instrument;
         this.side = side;
         this.type = type;
@@ -24,6 +26,9 @@ public class Order {
         this.qty = qty;
     }
 
+    public String id() {
+        return this.id;
+    }
     public Side side() {
         return side;
     }
