@@ -1,17 +1,16 @@
 package com.chertar;
 
-import com.chertar.util.Instrument;
-import com.chertar.util.MatchingEngineException;
-import com.chertar.util.OrderType;
-import com.chertar.util.Side;
+import com.chertar.util.*;
 import junit.framework.TestCase;
 
 import static org.assertj.core.api.Assertions.*;
 
 public class OrderTest extends TestCase {
-
+    private OrderIdGenerator idGenerator = new OrderIdGenerator();
+    private Instrument instrument = Instrument.of("BTC-USD");
     public void testGetters() {
-        Order order = new Order(Instrument.of("BTC-USD"), Side.BUY, OrderType.LIMIT,  10, 100.01);
+        Order order = new Order("test-1", instrument, Side.BUY, OrderType.LIMIT,  10, 100.01);
+        assertThat(order.id()).isEqualTo("test-1");
         assertThat(order.side()).isEqualTo(Side.BUY);
         assertThat(order.type()).isEqualTo(OrderType.LIMIT);
         assertThat(order.limitPrice().doubleValue()).isCloseTo(100.01, within(0.001));
@@ -20,7 +19,7 @@ public class OrderTest extends TestCase {
     }
 
     public void testProcessFill() {
-        Order order = new Order(Instrument.of("BTC-USD"), Side.BUY, OrderType.LIMIT,  10, 100.00);
+        Order order = new Order(idGenerator.next(), instrument, Side.BUY, OrderType.LIMIT,  10, 100.00);
 
         // First fill
         {
@@ -52,5 +51,15 @@ public class OrderTest extends TestCase {
                     .withMessageContaining("overfill");
 
         }
+    }
+    public void testCancel() {
+        Order order = new Order("o1", instrument, Side.BUY, OrderType.LIMIT, 10, 100.0);
+        assertThat(order.cancelled()).isFalse();
+        assertThat(order.leavesQty()).isEqualTo(10);
+
+        order.cancel();
+
+        assertThat(order.cancelled()).isTrue();
+        assertThat(order.leavesQty()).isEqualTo(0);
     }
 }

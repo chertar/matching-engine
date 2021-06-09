@@ -2,10 +2,7 @@ package com.chertar;
 
 import static com.chertar.util.Side.*;
 
-import com.chertar.util.Instrument;
-import com.chertar.util.OrderType;
-import com.chertar.util.Price;
-import com.chertar.util.Side;
+import com.chertar.util.*;
 import junit.framework.TestCase;
 
 import java.util.List;
@@ -17,6 +14,7 @@ import static org.assertj.core.util.Lists.list;
 public class MatchingEngineTest extends TestCase {
     private Instrument instrument = Instrument.of("BTC-USD");
     private MatchingEngine engine = new MatchingEngine(instrument);
+    private static OrderIdGenerator idGenerator = new OrderIdGenerator();
 
     public void testBuyLimitOrders() {
         buildOrderBook();
@@ -179,6 +177,68 @@ public class MatchingEngineTest extends TestCase {
         assertQuote(0, Double.NaN, 40, 14.0);
     }
 
+    public void testCancelingBuyOrder() {
+        buildOrderBook();
+
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25         11.0        40          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(25, 11.0, 40, 14.0);
+
+        Order order = new Order(idGenerator.next(), instrument, BUY, OrderType.LIMIT, 10, 11.0);
+        engine.process(order);
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25, 10     11.0        40          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(35, 11.0, 40, 14.0);
+
+        engine.cancel(order);
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25         11.0        40          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(25, 11.0, 40, 14.0);
+    }
+
+    public void testCancelingSellOrder() {
+        buildOrderBook();
+
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25         11.0        40          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(25, 11.0, 40, 14.0);
+
+        Order order = new Order(idGenerator.next(), instrument, SELL, OrderType.LIMIT, 10, 14.0);
+        engine.process(order);
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25, 10     11.0        40, 10          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(25, 11.0, 50, 14.0);
+
+        engine.cancel(order);
+        /** expected order book:
+         bidQty     bidPrice    askQty      askPrice
+         25         11.0        40          14.0
+         100, 50    10.0        80, 30     15.0
+         200        9.0         300         16.0
+         */
+        assertQuote(25, 11.0, 40, 14.0);
+    }
+
     /** creates order book:
      bidQty     bidPrice    askQty      askPrice
      25         11.0        40          14.0
@@ -219,7 +279,7 @@ public class MatchingEngineTest extends TestCase {
     }
 
     public static Order market(Side side, long qty) {
-        return new Order(Instrument.of("BTC-USD"),side, OrderType.MARKET, qty, Double.NaN);
+        return new Order(idGenerator.next(), Instrument.of("BTC-USD"),side, OrderType.MARKET, qty, Double.NaN);
     }
 
     public static Quote quote(long qty, double price) {
@@ -234,7 +294,7 @@ public class MatchingEngineTest extends TestCase {
     }
 
     private void submitOrderAndVerifyFills(Side side, OrderType type, long qty, double price, List<Fill> expectedFills) {
-        List<Fill> fills = engine.process(new Order(instrument, side, type, qty, price));
+        List<Fill> fills = engine.process(new Order(idGenerator.next(), instrument, side, type, qty, price));
         assertThat(fills).containsExactlyElementsOf(expectedFills);
     }
 

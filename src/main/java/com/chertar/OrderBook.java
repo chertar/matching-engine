@@ -120,4 +120,18 @@ public class OrderBook {
         Quote quote = new Quote(level.price(), level.qty());
         return quote;
     }
+    void cancel(Order order) {
+        if (order.side() != this.side) {
+            throw new MatchingEngineException("Cannot cancel an order iwth a different side");
+        }
+        if (order.isFullyFilled()) {
+            throw new MatchingEngineException("Fully filled order cannot be canceled");
+        }
+        PriceLevel level = this.priceLevelsMapped.get(order.limitPrice());
+        level.cancel(order);
+        if (level.queueSize() == 0) {
+            this.priceLevelsMapped.remove(level.price());
+            this.priceLevelsSorted.remove(level);
+        }
+    }
 }

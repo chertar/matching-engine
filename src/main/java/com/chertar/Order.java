@@ -7,16 +7,22 @@ import com.chertar.util.*;
  * and compute average price.
  */
 public class Order {
+    private final String id;
     private final Instrument instrument;
     private final Side side;
     private final OrderType type;
     private final Price limitPrice;
     private final long qty;
+    // Here I use a simple boolean to keep track of order state
+    // In a production implementation I would use an enum and
+    // support other states such as "filled", "rejected", etc.
+    private boolean canceled = false;
 
     private Price avgPrice = Price.of(0.0);
     private long filledQty;
 
-    public Order(Instrument instrument, Side side, OrderType type,  long qty, double limitPrice) {
+    public Order(String id, Instrument instrument, Side side, OrderType type,  long qty, double limitPrice) {
+        this.id = id;
         this.instrument = instrument;
         this.side = side;
         this.type = type;
@@ -24,6 +30,9 @@ public class Order {
         this.qty = qty;
     }
 
+    public String id() {
+        return this.id;
+    }
     public Side side() {
         return side;
     }
@@ -36,9 +45,19 @@ public class Order {
     public long qty() {
         return this.qty;
     }
+    public boolean cancelled() {
+        return canceled;
+    }
 
     public Instrument instrument() {
         return instrument;
+    }
+
+    public void cancel() {
+        if (canceled) {
+            throw new MatchingEngineException("Order is already canceled");
+        }
+        this.canceled = true;
     }
 
     public void processFill(Fill fill) {
@@ -60,7 +79,7 @@ public class Order {
         return qty == filledQty;
     }
     public long leavesQty() {
-        return qty - filledQty;
+        return canceled ? 0 : qty - filledQty;
     }
     public long filledQty() {
         return filledQty;
@@ -73,11 +92,14 @@ public class Order {
     @Override
     public String toString() {
         return "Order{" +
-                "side=" + side +
+                "id=" + id +
+                " side=" + side +
                 ", type=" + type +
                 ", limitPrice=" + limitPrice +
                 ", qty=" + qty +
                 ", filledQty=" + filledQty +
+                ", canceled=" + canceled +
+                ", leaves=" + leavesQty() +
                 '}';
     }
 

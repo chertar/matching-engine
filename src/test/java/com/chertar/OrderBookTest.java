@@ -15,6 +15,7 @@ import static org.assertj.core.util.Lists.list;
 
 public class OrderBookTest extends TestCase {
     private static Instrument instrument = Instrument.of("BTC-USD");
+    private static OrderIdGenerator idGenerator = new OrderIdGenerator();
     public void testPosting() {
         // BUYS
         testPermutation(BUY, list(), quote(0, Double.NaN));
@@ -149,7 +150,6 @@ public class OrderBookTest extends TestCase {
                 quote(100,100.25));
     }
 
-    @Test
     public void testMarketOrder() {
         testPermutation(SELL,
                 list(limit(SELL, 100, 100.25)),
@@ -158,7 +158,6 @@ public class OrderBookTest extends TestCase {
                 quote(0, Double.NaN));
     }
 
-    @Test
     public void testMatchingOnQty() {
         // order qty < resting qty
         testPermutation(BUY,
@@ -175,7 +174,6 @@ public class OrderBookTest extends TestCase {
                 quote(0, Double.NaN));
     }
 
-    @Test
     public void testMatchingMultipleFills() {
         testPermutation(BUY,
                 list(limit(BUY, 10, 100.25),
@@ -186,7 +184,6 @@ public class OrderBookTest extends TestCase {
                 quote(80, 100.25));
     }
 
-    @Test
     public void testMatchingMultiplePriceLevels() {
         testPermutation(BUY,
                 list(limit(BUY, 10, 100.50),
@@ -195,6 +192,31 @@ public class OrderBookTest extends TestCase {
                 list(fill(10, 100.50),
                      fill(20, 100.25)),
                 quote(80, 100.25));
+    }
+
+    public void testCancelingOrders() {
+        OrderBook book = new OrderBook(BUY);
+        Order order1 = limit(BUY, 10, 101.0);
+        Order order2 = limit(BUY, 20, 100.0);
+        Order order3 = limit(BUY, 30, 99.0);
+
+        book.post(order1);
+        book.post(order2);
+        book.post(order3);
+
+        assertThat(book.topQuote()).isEqualTo(Quote.from(10, 101.0));
+
+        // Cancel the second order, top quote should not change
+        book.cancel(order2);
+        assertThat(book.topQuote()).isEqualTo(Quote.from(10, 101.0));
+
+        // Cancel the first order, top of book should match order3 since order2 is already gone
+        book.cancel(order1);
+        assertThat(book.topQuote()).isEqualTo(Quote.from(30, 99.0));
+
+        // Cancel the third order, order book shoudl become blank
+        book.cancel(order3);
+        assertThat(book.topQuote()).isEqualTo(Quote.nullQuote());
     }
 
     private Fill fill(long qty, double price) {
@@ -218,10 +240,10 @@ public class OrderBookTest extends TestCase {
         assertThat(quote).isEqualTo(expectedQuote);
     }
     public static Order limit(Side side,  long qty, double price) {
-        return new Order(instrument, side, OrderType.LIMIT, qty, price);
+        return new Order(idGenerator.next(),instrument, side, OrderType.LIMIT, qty, price);
     }
     public static Order market(Side side,  long qty) {
-        return new Order(instrument, side, OrderType.MARKET, qty, Double.NaN);
+        return new Order(idGenerator.next(), instrument, side, OrderType.MARKET, qty, Double.NaN);
     }
 
     public static Quote quote(long qty, double price) {
