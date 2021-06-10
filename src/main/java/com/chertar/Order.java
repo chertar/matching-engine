@@ -57,6 +57,9 @@ public class Order {
         if (canceled) {
             throw new MatchingEngineException("Order is already canceled");
         }
+        if (type == OrderType.MARKET) {
+            throw new MatchingEngineException("Market order cannot be canceled");
+        }
         this.canceled = true;
     }
 

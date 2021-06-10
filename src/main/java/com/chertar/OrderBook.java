@@ -121,8 +121,17 @@ public class OrderBook {
         return quote;
     }
     void cancel(Order order) {
+        if (order.isFullyFilled()) {
+            throw new MatchingEngineException("Cannot cancel. Order is fully filled.");
+        }
+        if(order.cancelled()) {
+            throw new MatchingEngineException("Order is already canceled");
+        }
+        if (order.type() == OrderType.MARKET) {
+            throw new MatchingEngineException("Cannot cancel a market order");
+        }
         if (order.side() != this.side) {
-            throw new MatchingEngineException("Cannot cancel an order iwth a different side");
+            throw new MatchingEngineException("Cannot cancel an order with a different side");
         }
         PriceLevel level = this.priceLevelsMapped.get(order.limitPrice());
         if (level == null) {

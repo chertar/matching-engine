@@ -62,4 +62,9 @@ public class OrderTest extends TestCase {
         assertThat(order.cancelled()).isTrue();
         assertThat(order.leavesQty()).isEqualTo(0);
     }
+    public void testInvalidCancel() {
+        Order order = new Order("o1", instrument, Side.BUY, OrderType.MARKET, 10, 100.0);
+        assertThat(order.cancelled()).isFalse();
+        assertThat(order.leavesQty()).isEqualTo(10);
+    }
 }

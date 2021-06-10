@@ -52,20 +52,28 @@ public class MatchingApp {
                     orderCache.add(order);
                     MatchingEngine engine = engineMap.get(order.instrument());
                     List<Fill> fills = engine.process(order);
-                    System.out.print("Created order id=" + order.id());
+                    System.out.printf("\tORDER ID ==> %s\n", order.id());
 
                     if (fills.isEmpty()) {
-                        System.out.println(". No fills");
+                        System.out.println("\tNo fills");
                     }
                     else {
-                        System.out.println(". You got FILLS!");
+                        System.out.print("\tYou got FILLS ==> ");
+                        boolean firstFill = true;
                         for (Fill fill : fills) {
-                            System.out.printf("%10d %10.2f\n", fill.qty(), fill.price().doubleValue());
+                            if (firstFill) {
+                                firstFill = false;
+                            } else {
+                                System.out.print(", ");
+                            }
+
+                            System.out.printf("%d @ %.2f", fill.qty(), fill.price().doubleValue());
                         }
+                        System.out.print("\n");
                     }
                 }
                 else {
-                    throw new IllegalArgumentException("Unreconized command. Command must be LIMIT, MARKET or CANCEL");
+                    throw new IllegalArgumentException("Unrecognized command. Command must be LIMIT, MARKET or CANCEL");
                 }
 
                 printQuotes();
@@ -89,13 +97,13 @@ public class MatchingApp {
     }
 
     private void printQuotes() {
-        System.out.printf("%10s: %10s %10s %10s %10s\n",
+        System.out.printf("\t%10s: %10s %10s %10s %10s\n",
                 "Instrument", "bidQty", "bidPrice","askQty","askPrice");
         for (Instrument instrument : instruments) {
             MatchingEngine engine = engineMap.get(instrument);
             Quote topBids = engine.topBids();
             Quote topAsks = engine.topAsks();
-            System.out.printf("%10s: %10d %10.2f %10d %10.02f\n",
+            System.out.printf("\t%10s: %10d %10.2f %10d %10.02f\n",
                     instrument.symbol(), topBids.qty(), topBids.price().doubleValue(), topAsks.qty(), topAsks.price().doubleValue());
         }
     }

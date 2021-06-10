@@ -218,6 +218,30 @@ public class OrderBookTest extends TestCase {
         book.cancel(order3);
         assertThat(book.topQuote()).isEqualTo(Quote.nullQuote());
     }
+    public void testCancelingPartiallyFilledOrder() {
+        // Partial fill
+        OrderBook book = new OrderBook(BUY);
+        Order order1 = limit(BUY, 10, 101.0);
+        book.post(order1);
+        book.match(limit(SELL, 3, 101.0));
+
+        assertThat(order1.filledQty()).isEqualTo(3);
+        assertThat(book.topQuote()).isEqualTo(Quote.from(7, 101.0));
+
+        book.cancel(order1);
+        assertThat(order1.cancelled()).isTrue();
+        assertThat(book.topQuote()).isEqualTo(Quote.from(0, Double.NaN));
+    }
+    public void testCancelingFullyFilledOrder() {
+        OrderBook book = new OrderBook(BUY);
+        Order order1 = limit(BUY, 10, 101.0);
+        book.post(order1);
+        book.match(limit(SELL, 10, 101.0));
+
+        assertThatExceptionOfType(MatchingEngineException.class)
+                .isThrownBy(()-> book.cancel(order1))
+                .withMessageContaining("Cannot cancel. Order is fully filled");
+    }
 
     private Fill fill(long qty, double price) {
         return Fill.from(price, qty);

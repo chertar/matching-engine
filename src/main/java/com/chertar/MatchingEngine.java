@@ -51,15 +51,6 @@ public class MatchingEngine {
         return this.asks.topQuote();
     }
     public void cancel(Order order) {
-        if (order.cancelled()) {
-            throw new MatchingEngineException("Order is already canceled");
-        }
-        if (order.isFullyFilled()) {
-            throw new MatchingEngineException("Cannot cancel.  Order is fully filled.");
-        }
-        if (order.type() == OrderType.MARKET) {
-            throw new MatchingEngineException("Cannot cancel a market order");
-        }
         OrderBook book = order.side().isBuy() ? bids : asks;
         book.cancel(order);
     }
