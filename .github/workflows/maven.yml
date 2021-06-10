@@ -26,5 +26,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: matching-engine-1.0.jar
-        path: target/matching-engine-1.0.jar
+        name: matching-engine.jar
+        path: target/matching-engine*.jar
