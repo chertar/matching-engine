@@ -71,10 +71,20 @@ public class MatchingApp {
                 printQuotes();
             }
             catch (IllegalArgumentException e) {
-                error(e.getMessage());
+                error("Error parsing command. " + e.getMessage());
                 printExamples();
             }
-            prompt();
+            catch (MatchingEngineException e) {
+                error("Matching engine returned an error: " + e.getMessage());
+                printExamples();
+            }
+            catch(Exception e) {
+                error("General exception occurred. " + e.getClass().getSimpleName() + " : " + e.getMessage());
+                printExamples();
+            }
+            finally {
+                prompt();
+            }
         }
     }
 
@@ -133,9 +143,9 @@ public class MatchingApp {
 
     private static void printExamples() {
         System.out.print("Enter a command:\n");
-        System.out.print("\t - LIMIT BUY/SELL qty instrument price. Example: LIMIT BUY 10 BTC-USD 100.0\n");
-        System.out.print("\t - MARKET BUYS/SELL qty instrument. Example: MARKET SELL 10 BTC-USD\n");
-        System.out.print("\t - CANCEL orderId.  Example CANCEL 3\n");
+        System.out.print("\t - limit buy/sell qty instrument price. Example: limit buy 10 btc-usd 100.0\n");
+        System.out.print("\t - market buy/sell qty instrument. Example: market sell 10 btc-usd\n");
+        System.out.print("\t - cancel orderId.  Example cancel 3\n");
     }
 
     private static void error(String msg) {
