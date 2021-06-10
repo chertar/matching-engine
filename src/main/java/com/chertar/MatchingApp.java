@@ -45,7 +45,7 @@ public class MatchingApp {
                     }
                     MatchingEngine engine = engineMap.get(order.instrument());
                     engine.cancel(order);
-                    System.out.println("Canceled order " + order);
+                    System.out.println("\tCanceled order " + order);
                 }
                 else if (line.startsWith("LIMIT") || line.startsWith("MARKET")) {
                     Order order = parseOrder(line);
@@ -150,14 +150,14 @@ public class MatchingApp {
     }
 
     private static void printExamples() {
-        System.out.print("Enter a command:\n");
-        System.out.print("\t - limit buy/sell qty instrument price. Example: limit buy 10 btc-usd 100.0\n");
-        System.out.print("\t - market buy/sell qty instrument. Example: market sell 10 btc-usd\n");
-        System.out.print("\t - cancel orderId.  Example cancel 3\n");
+        System.out.print("\tSupported commands:\n");
+        System.out.print("\t\t - limit buy/sell qty instrument price. Example: limit buy 10 btc-usd 100.0\n");
+        System.out.print("\t\t - market buy/sell qty instrument. Example: market sell 10 btc-usd\n");
+        System.out.print("\t\t - cancel orderId.  Example cancel 3\n");
     }
 
     private static void error(String msg) {
-        System.out.println("ERROR: " + msg);
+        System.out.println("\tERROR: " + msg);
     }
     public static void main(String[] args) {
         MatchingApp app = new MatchingApp();
