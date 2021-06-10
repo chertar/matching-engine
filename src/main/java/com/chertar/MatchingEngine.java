@@ -32,7 +32,15 @@ public class MatchingEngine {
         this.instrument = instrument;
     }
 
-    public List<Fill> process(Order order) {
+    /**
+     * Entry point for submitting a new order to the matching engine
+     * Attempts to match the order against the opposite side
+     * then posts the leaves quantity if it's a limit order
+     *
+     * @param order
+     * @return the fills that resulted from matchin this order if any
+     */
+    public List<Fill> newOrder(Order order) {
         if (!order.instrument().equals(this.instrument)) {
             throw new MatchingEngineException("Instrument does not match");
         }
@@ -44,14 +52,34 @@ public class MatchingEngine {
         }
         return fills;
     }
-    public Quote topBids() {
-        return this.bids.topQuote();
-    }
-    public Quote topAsks() {
-        return this.asks.topQuote();
-    }
+
+    /**
+     * Cancelss the provided order
+     * @param order
+     * @throws MatchingEngineException if the order is:
+     *      - fully filled
+     *      - already canceled
+     *      - a market order
+     *      - of a different side than this order book
+     */
     public void cancel(Order order) {
         OrderBook book = order.side().isBuy() ? bids : asks;
         book.cancel(order);
     }
+
+    /**
+     * @return the bed bid price and total quantity available at that price
+     */
+    public Quote topBids() {
+        return this.bids.topQuote();
+    }
+
+    /**
+     * @return the best ask price and the total quantity available at that price
+     */
+    public Quote topAsks() {
+        return this.asks.topQuote();
+    }
+
+
 }

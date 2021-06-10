@@ -120,6 +120,16 @@ public class OrderBook {
         Quote quote = new Quote(level.price(), level.qty());
         return quote;
     }
+
+    /**
+     * Cancelss the provided order
+     * @param order
+     * @throws MatchingEngineException if the order is:
+     *      - fully filled
+     *      - already canceled
+     *      - a market order
+     *      - of a different side than this order book
+     */
     void cancel(Order order) {
         if (order.isFullyFilled()) {
             throw new MatchingEngineException("Cannot cancel. Order is fully filled.");

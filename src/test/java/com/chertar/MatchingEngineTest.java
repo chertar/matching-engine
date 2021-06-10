@@ -189,7 +189,7 @@ public class MatchingEngineTest extends TestCase {
         assertQuote(25, 11.0, 40, 14.0);
 
         Order order = new Order(idGenerator.next(), instrument, BUY, OrderType.LIMIT, 10, 11.0);
-        engine.process(order);
+        engine.newOrder(order);
         /** expected order book:
          bidQty     bidPrice    askQty      askPrice
          25, 10     11.0        40          14.0
@@ -220,7 +220,7 @@ public class MatchingEngineTest extends TestCase {
         assertQuote(25, 11.0, 40, 14.0);
 
         Order order = new Order(idGenerator.next(), instrument, SELL, OrderType.LIMIT, 10, 14.0);
-        engine.process(order);
+        engine.newOrder(order);
         /** expected order book:
          bidQty     bidPrice    askQty      askPrice
          25, 10     11.0        40, 10          14.0
@@ -294,7 +294,7 @@ public class MatchingEngineTest extends TestCase {
     }
 
     private void submitOrderAndVerifyFills(Side side, OrderType type, long qty, double price, List<Fill> expectedFills) {
-        List<Fill> fills = engine.process(new Order(idGenerator.next(), instrument, side, type, qty, price));
+        List<Fill> fills = engine.newOrder(new Order(idGenerator.next(), instrument, side, type, qty, price));
         assertThat(fills).containsExactlyElementsOf(expectedFills);
     }
 

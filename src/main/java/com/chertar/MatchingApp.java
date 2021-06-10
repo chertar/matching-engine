@@ -51,7 +51,7 @@ public class MatchingApp {
                     Order order = parseOrder(line);
                     orderCache.add(order);
                     MatchingEngine engine = engineMap.get(order.instrument());
-                    List<Fill> fills = engine.process(order);
+                    List<Fill> fills = engine.newOrder(order);
                     System.out.printf("\tORDER ID ==> %s\n", order.id());
 
                     if (fills.isEmpty()) {
